@@ -23,7 +23,7 @@
     {
       kind: "nav", sel: "#nav-convert",
       title: "文档排版",
-      text: "把本地或在线文档按模板重新排版，一键输出格式规范的 Word 文档；排版在线文档需先扫码登录。",
+      text: "把本地文档按模板重新排版，一键输出格式规范的 Word 文档。",
     },
   ];
 
@@ -72,14 +72,14 @@
     const card = el("div", "ob-welcome");
     card.innerHTML =
       '<div class="ob-welcome-title">欢迎使用文档审核</div>' +
-      '<div class="ob-welcome-desc">把在线或本地文档，按规范模板重新排版，三步得到格式规范的 Word 文档：</div>' +
+      '<div class="ob-welcome-desc">把本地文档，按规范模板重新排版，三步得到格式规范的 Word 文档：</div>' +
       '<ul class="ob-lines">' +
       '<li><div class="ob-line-head"><span class="ob-no">1</span><b>设置 · 配置模型服务</b><i>必选</i></div>' +
       '<div class="ob-line-text">配置 LLM 大模型服务后方可启用 AI 增强能力，进行模板导入、文档排版。</div></li>' +
       '<li><div class="ob-line-head"><span class="ob-no">2</span><b>新建 / 导入模板</b></div>' +
       '<div class="ob-line-text">模板决定输出规范。可以从零新建，也可以从已有 Word 文档导入版式。</div></li>' +
       '<li><div class="ob-line-head"><span class="ob-no">3</span><b>文档排版</b><i>核心能力</i></div>' +
-      '<div class="ob-line-text">输入本地或在线文档链接，选择模板和格式选项，输出格式规范的 Word 文档。</div></li>' +
+      '<div class="ob-line-text">输入本地文档，选择模板和格式选项，输出格式规范的 Word 文档。</div></li>' +
       "</ul>" +
       '<div class="ob-actions">' +
       '<button class="small" id="ob-skip">跳过</button>' +

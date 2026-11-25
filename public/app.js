@@ -231,8 +231,8 @@ function toast(msg, type = "") {
 }
 
 // LLM 配置前置检查（导入模板 / 文档排版共用）：
-//   —— 判据与设置页一致：只认"当前启用的那一个"（内置已登录且启用 / 自配中被启用且挂了模型）；
-//   一个都没启用 → false，由调用方提示用户登录或去「设置」启用，不发起任务、不产生占位。
+//   —— 判据与设置页一致：只认"当前启用的那一个"（自配中被启用且挂了模型）；
+//   一个都没启用 → false，由调用方提示用户到「设置」启用，不发起任务、不产生占位。
 // 查询接口失败时不拦截（返回 true），由后端执行时报错兜底，避免网络抖动误伤正常流程。
 async function checkLlmConfigured() {
   try {
@@ -848,10 +848,8 @@ function newConvertTask() {
   // 仅让共享显示区脱离任务流（回到新建表单态），不再显示任何任务的过程
   focusedRunId = null;
   _historyViewTask = null;   // 脱离历史查看
-  _convEchoTask = false;     // 回到新建任务态 → 在线文档链接入口重新受登录闸管
+  _convEchoTask = false;     // 回到新建任务态
   updateReconvertBtn();      // 右上角「重新转换」隐藏（无重跑对象）
-  document.getElementById("input-url").value = "";
-  syncCopyUrlBtn();
   convertLocalFiles = []; renderUploadList();
   _urlHitHint = null;
   currentTsFile = "";
@@ -866,7 +864,6 @@ function newConvertTask() {
   if (blockInput) { blockInput.classList.remove("collapsed"); blockInput.classList.remove("link-only", "local-only"); }
   if (blockTemplate) blockTemplate.classList.remove("collapsed");
   if (blockInherit) blockInherit.classList.remove("collapsed");
-  applyOnlineLinkGate(_loginOk);   // 新建任务态：未登录则收起链接入口（并同步摘要/③置灰）
   // 清空过程区
   const rb = document.getElementById("result-block");
   const procEl = document.getElementById("conv-process");
@@ -4402,143 +4399,47 @@ function selectElem(key, paraEl) {
 }
 
 // ═══════════════════════════════════════════
-// 登录状态
+// 登录功能已移除（本版只处理本地文档上传，不需要在线文档 / 扫码登录）。
+// 以下保留空实现，避免历史任务回显等路径引用报错。
 // ═══════════════════════════════════════════
-// 登录态查询（不再展示状态行，供转换/轮询判断用）。返回 {ok, mode, authExpiresAt, user}。
-// prefetched：已在手的 /api/status 响应——启动路径先用 refreshStatus 取过一次，复用即可，不再重复请求。
+let _loginOk = false;      // 兼容旧引用：恒 false（无登录）
+let _convEchoTask = false; // 转换页当前是否在回显任务来源（openTask / restoreConvProcess）而非新建任务态
+
 async function refreshLoginStatus(prefetched) {
-  let st;
-  try {
-    const r = prefetched || await api("/api/status");
-    st = (r && r.login) || { ok: false, reason: "未登录" };
-  } catch (e) {
-    st = { ok: false, reason: "launcher 不可达：" + e.message };
-  }
-  renderLoginEntry(st);   // 侧栏底部登录入口随登录态刷新（这里 = 全站唯一刷新点）
-  return st;
+  return { ok: false, reason: "已禁用登录" };
 }
 
-// ── 在线文档链接入口的登录闸 ──
-// 规则：链接输入框（含「复制链接」与链接格式提示）在**新建任务态**只在登录后显示；未登录时整行隐藏
-// （#block-input.no-login，见 style.css）。登录态刷新点唯一 = renderLoginEntry（refreshLoginStatus 与
-// doLogin 成功都汇到这里），别处不要另开开关。
-// 例外：回显某个任务的来源时（历史任务 / 聚焦任务）**不设闸** —— 任务是既有记录，来源照常展示，
-// 未登录时最多只是重新转换会要求授权（见 doConvert 前置登录），不因此把来源藏起来。
-let _loginOk = false;      // 当前登录态（renderLoginEntry 单点写入）
-let _convEchoTask = false; // 转换页当前是否在回显任务来源（openTask / restoreConvProcess）而非新建任务态
 function applyOnlineLinkGate(ok) {
   _loginOk = !!ok;
-  const blockInput = document.getElementById("block-input");
-  if (!blockInput) return;
-  blockInput.classList.toggle("no-login", !(_loginOk || _convEchoTask));
-  // 摘要与③卡片置灰都跟着「链接入口是否成立」走：成立 → 摘要该显示在线文档、③按 link 置灰（反之亦然）
   updateInputSummary();
   applyInheritDisabled();
-  if (_loginOk || _convEchoTask) return;
-  // 未登录的新建任务态：链接行连同「已有任务」提示一起收起（.no-login 已隐藏整行）。
-  // 输入框里的值不清 —— 可能是登录时贴的、或被回显过的来源；闸门只让它「不算输入源」
-  // （见 onlineLinkShown 的调用点），登录后原样回到界面上，不丢用户内容。
-  hideUrlHint();
-}
-// 链接入口是否成立（界面上可见可编辑）。判据取 #block-input 的 no-login 类 = 唯一真源：
-// 「看不见的链接不得当输入源」，否则会出现「界面上没链接、点开始转换却按那条链接发起在线转换」的鬼状态。
-// 回显任务来源时（no-login 被摘掉）链接成立 —— 所以未登录也能直接对历史在线任务点「重新转换」。
-function onlineLinkShown() {
-  const blockInput = document.getElementById("block-input");
-  return !!(blockInput && !blockInput.classList.contains("no-login"));
 }
 
-// 侧栏底部登录入口：未登录「登录」/ 已登录显示用户名（图标转绿）。
-// 折叠态 tooltip 取 dataset.label（见 renderSidebarCollapse），故此处同步维护。
+function onlineLinkShown() {
+  return false;
+}
+
 function renderLoginEntry(st) {
-  const item = document.getElementById("nav-login");
-  const ok = !!(st && st.ok);
-  applyOnlineLinkGate(ok);   // 链接入口显隐跟着登录态走（含「入口先于侧栏元素」的场景，故放在 return 之前）
-  if (!item) return;
-  const name = ok ? ((st.user && (st.user.name || st.user.username)) || "") : "";
-  const text = ok ? (name || "已登录") : "登录";
-  const lbl = document.getElementById("lbl-login");
-  if (lbl) lbl.textContent = text;
-  item.classList.toggle("logged", ok);
-  item.dataset.label = text;
-  item.setAttribute("aria-label", ok ? "已登录（" + text + "），点击查看登录信息" : "登录");
-  item.title = ok ? "已登录：" + text : "登录（扫码授权）";
-  const ic = document.getElementById("ic-login");
-  if (ic) ic.innerHTML = ICONS.login;
+  _loginOk = !!(st && st.ok);
+  updateInputSummary();
+  applyInheritDisabled();
   if (typeof renderSidebarCollapse === "function") renderSidebarCollapse();
 }
 
-// 侧栏底部账号入口点击：一律先弹菜单。
-//
-// 旧行为是未登录时点击直接扫码；但菜单现在装着「检查更新」这个与登录无关的功能项，
-// 那样会把它一起锁在扫码动作后面。扫码改为菜单里的显式一项（与转录的账号菜单同构）。
 async function onNavLogin() {
-  const anchor = document.getElementById("nav-login");
-  const st = await refreshLoginStatus();
-  await openAccountMenu(anchor, st);
+  // 无登录入口，不做任何事
 }
 
-/** 账号菜单头部（已登录时）：账号 / 邮箱 / 状态 / 有效期至 */
 function loginMenuHeader(st) {
-  const u = (st && st.user) || {};
-  const name = u.name || u.username || "（未取到用户名）";
-  const rows = [`<div class="lm-row"><span class="lm-k">账号</span><span class="lm-v">${esc(name)}</span></div>`];
-  if (u.email) rows.push(`<div class="lm-row"><span class="lm-k">邮箱</span><span class="lm-v">${esc(u.email)}</span></div>`);
-  rows.push(`<div class="lm-row"><span class="lm-k">状态</span><span class="lm-v lm-ok">已登录</span></div>`);
-  if (st && st.authExpiresAt) {
-    const d = new Date(st.authExpiresAt * 1000);
-    const p = n => String(n).padStart(2, "0");
-    rows.push(`<div class="lm-row"><span class="lm-k">有效期至</span><span class="lm-v">${d.getFullYear()}/${p(d.getMonth() + 1)}/${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}</span></div>`);
-  }
-  return `<div class="login-menu-head">${rows.join("")}</div><div class="login-menu-sep"></div>`;
+  return "";
 }
 
-/**
- * 侧栏底部账号菜单。
- *
- * ★ 更新入口统一在这里 —— 与转录（点侧栏底部账号 → 菜单里的「检查更新」）同一位置、
- *   同一句话，右侧同样显示当前版本。之前它挂在设置页的「软件更新」卡上，两个产品各一套
- *   说法，用户换个产品就得重新找一次。
- *
- * 点击后菜单自动关闭（openSubmenu 的既有行为），所以检查结果走 toast / 更新弹窗给。
- */
 async function openAccountMenu(anchor, st) {
-  if (!anchor) return;
-  await refreshUpdateState();
-  const ok = !!(st && st.ok);
-  const items = [];
-  if (!ok) items.push({ icon: ICONS.login, label: "扫码登录", onClick: () => doLogin(null) });
-  if (updater.pending && updater.pending.version) {
-    // 已下载待重启：别再让人下第二遍
-    items.push({
-      icon: ICONS.refresh,
-      label: "重启以完成更新",
-      hint: versionText(updater.pending.version),
-      onClick: () => openUpdateRestartModal(updater.pending),
-    });
-  } else {
-    items.push({
-      icon: ICONS.refresh,
-      label: "检查更新",
-      hint: versionText(updater.current),
-      onClick: () => checkForUpdate(true),
-    });
-  }
-  if (ok) items.push({ icon: ICONS.logout, label: "退出登录", danger: true, onClick: doLogout });
-  openSubmenu(anchor, items, { align: "topleft", header: ok ? loginMenuHeader(st) : "" });
+  // 无账号菜单，不做任何事
 }
 
-// 退出登录：清 launcher 令牌 → 刷新登录态（侧栏入口回到「登录」、内置凭证转为未登录态）
 async function doLogout() {
-  try {
-    const r = await api("/api/oauth/logout", { method: "POST" });
-    if (!r || !r.ok) { toast("退出失败，请重试", "err"); return; }
-    await refreshLoginStatus();
-    if (typeof loadLlmList === "function") loadLlmList();   // 内置凭证随之失效
-    toast("已退出登录");
-  } catch (e) {
-    toast("退出失败：" + e.message, "err");
-  }
+  // 无登录，不做任何事
 }
 
 // ── 转换任务（每次成功生成自动记录，左侧「文档排版」下展示，可点击恢复重转）──
@@ -4650,11 +4551,8 @@ const INHERIT_KIND_SUPPORT = {
   md:   ["bold", "italic"],
   other: [],                                                             // txt/json：无 run 格式
 };
-// 判定当前输入源类型：优先链接（在线），否则看本地文件扩展名；无输入 → null（全启用）。
-// 与 buildConvertInputs 同口径：链接入口不成立时（未登录的新建任务态）链接不算输入源
+// 判定当前输入源类型：看本地文件扩展名；无输入 → null（全启用）。
 function currentInputKind() {
-  const link = onlineLinkShown() ? (document.getElementById("input-url").value || "").trim() : "";
-  if (link) return "link";
   if (convertLocalFiles.length) {
     const name = (convertLocalFiles[0].name || "").toLowerCase();
     const ext = name.includes(".") ? name.split(".").pop() : "";
@@ -5144,25 +5042,17 @@ async function openTask(task) {
   // 历史任务：第④步「开始转换」发起区隐藏（右上角「重新转换」负责重跑该历史）
   const actionsRowHist = document.getElementById("actions-row");
   if (actionsRowHist) actionsRowHist.style.display = "none";
-  // 历史任务输入源只显示一个：链接或本地文件。
-  // 在线文档任务照常展示来源（**即使未登录**）：任务是既有记录，来源该看得见；要授权的是「重新转换」那一刻，
-  // 到那时才弹（见 doConvert 前置登录）。故这里把链接入口从闸门里放出来（_convEchoTask + 重跑一次闸门）。
-  const inputUrl = document.getElementById("input-url");
-  const urlHint = document.getElementById("url-hint");
+  // 历史任务输入源只显示本地文件；在线文档任务已不支持，回显时清空并提示
   _convEchoTask = true;
   if (blockInput) blockInput.classList.remove("link-only", "local-only");
   if (task.inputType === "local") {
     if (blockInput) blockInput.classList.add("local-only");
-    if (inputUrl) inputUrl.value = "";
-    if (urlHint) { urlHint.style.display = "none"; urlHint.textContent = ""; }
     convertLocalFiles = (task.files || []).map(f => ({ name: f.name || "", size: f.size || 0, path: f.path || "" }));
   } else {
     if (blockInput) blockInput.classList.add("link-only");
     clearLocalFiles();
-    if (inputUrl) inputUrl.value = task.url || "";
+    toast("该任务来源为在线文档，本版本已不再支持在线文档", "warn");
   }
-  applyOnlineLinkGate(_loginOk);   // 回显来源 → 摘掉 no-login（未登录也让链接行显示）
-  syncCopyUrlBtn();
   renderUploadList();
   // 等模板集列表填充后恢复选择
   await refreshConvertView(task.tsFile);
@@ -5267,33 +5157,17 @@ function rebindReasonToggle(procEl) {
   });
 }
 
-// ── 文档链接历史（最近 10 条，由任务列表派生，与任务保持一致）──
-// 输入框命中已有任务链接 → 提示一次（不重复弹）
+// ── 文档链接历史已移除（不再支持在线文档）──
 let _urlHitHint = null;
 function onUrlInput() {
-  const v = document.getElementById("input-url").value.trim();
-  const hintEl = document.getElementById("url-hint");
-  if (!v) { _urlHitHint = null; if (hintEl) { hintEl.style.display = "none"; hintEl.textContent = ""; } return; }
-  if (v === _urlHitHint) return;
-  _urlHitHint = v;
-  const hit = loadTasks().some(t => t.url === v);
-  if (hintEl) {
-    if (hit) {
-      hintEl.style.display = "";
-      hintEl.textContent = "该链接已有任务：可在左侧「文档排版」列表点击打开重新转换（同一文档自动更新）";
-    } else {
-      hintEl.style.display = "none"; hintEl.textContent = "";
-    }
-  }
+  // 在线文档链接已移除，保留空实现避免引用报错
 }
 
 // ═══════════════════════════════════════════
 // 转换视图
 // ═══════════════════════════════════════════
 async function refreshConvertView(forceFile, clearSelection) {
-  // 一次请求同时喂模板集选择器与侧栏登录入口（此前相邻两处各取一次同一接口）
   const st = await refreshStatus().catch(() => null);
-  await refreshLoginStatus(st);
   if (!st) return;
   const all = [...st.templatesets];
   if (state.templateSet && state.currentFile && !all.some(t => t.file === state.currentFile)) {
@@ -5514,10 +5388,10 @@ function renderUploadList() {
   applyInheritDisabled();   // 本地文件增减 → 同步③卡片置灰
 }
 
-// 链接 / 本地互斥：用其一即清空另一种
-function clearLocalFiles() { convertLocalFiles = []; renderUploadList(); hideUrlHint(); }
-function clearLink() { const u = document.getElementById("input-url"); if (u) u.value = ""; syncCopyUrlBtn(); }
-function hideUrlHint() { const el = document.getElementById("url-hint"); if (el) { el.style.display = "none"; el.textContent = ""; } }
+// 链接 / 本地互斥已移除（仅本地）；保留空实现避免引用报错
+function clearLocalFiles() { convertLocalFiles = []; renderUploadList(); }
+function clearLink() { /* 在线链接已移除 */ }
+function hideUrlHint() { /* 在线链接已移除 */ }
 
 // 本地文件展示名：上传落盘的临时路径 → 原始文件名（addLocalFiles 里的映射）；无匹配原样返回。
 // 服务端 read 事件只知道落盘路径，原始名只在前端有，读取行/统计卡源行经此换名，不向用户暴露 temp 路径
@@ -5526,17 +5400,13 @@ function localDisplayName(p) {
   return (hit && hit.name) || p || "";
 }
 
-// 「复制链接」按钮可用态：链接为空则置灰（所有清空/回填链接的地方都要调一次）
+// 「复制链接」按钮已移除；保留空实现避免引用报错
 function syncCopyUrlBtn() {
-  const btn = document.getElementById("btn-copy-url");
-  const u = document.getElementById("input-url");
-  if (btn && u) btn.disabled = !(u.value || "").trim();
+  // 在线链接已移除，无按钮需要同步
 }
 
 function buildConvertInputs() {
-  // 链接入口不成立时（未登录的新建任务态）：输入框里的残留值不算输入源
-  const link = onlineLinkShown() ? (document.getElementById("input-url").value || "").trim() : "";
-  if (link) return { inputType: "link", inputs: [link], label: link };
+  // 仅支持本地上传；在线文档链接入口已移除。
   if (convertLocalFiles.length) return { inputType: "local", inputs: convertLocalFiles.map(f => f.path), label: convertLocalFiles.map(f => f.name).join("、"), files: convertLocalFiles.slice() };
   return null;
 }
@@ -5550,9 +5420,6 @@ function truncateMiddle(s, max) {
 function updateInputSummary() {
   const sum = document.getElementById("input-summary");
   if (!sum) return;
-  // 链接入口不成立时不展示链接摘要：行整行隐藏着，摘要里再提一句「在线文档：…」只会前后不一致
-  const link = onlineLinkShown() ? (document.getElementById("input-url").value || "").trim() : "";
-  if (link) { sum.textContent = "在线文档：" + truncateMiddle(link, 70); return; }
   if (convertLocalFiles.length) {
     const names = convertLocalFiles.map(f => f.name).join("、");
     sum.textContent = `本地文件（${convertLocalFiles.length}个）：${names}`;
@@ -5640,26 +5507,19 @@ function restoreConvProcess() {
   updateInputSummary();
   updateTemplateSummary();
   updateInheritSummary();
-  // 恢复输入源显示（该任务实际使用的方式）。同 openTask：这是回显既有任务的来源，链接不设登录闸
-  // → 未登录也能看到在线文档来源、并对它点「重新转换」（那时才要授权）。
-  const inputUrl = document.getElementById("input-url");
-  const urlHint = document.getElementById("url-hint");
+  // 恢复输入源显示（该任务实际使用的方式）。在线文档任务已不支持，回显时清空并提示。
   _convEchoTask = true;
   if (blockInput) blockInput.classList.remove("link-only", "local-only");
   if (t.input) {
     if (t.input.inputType === "local") {
       if (blockInput) blockInput.classList.add("local-only");
-      if (inputUrl) inputUrl.value = "";
-      if (urlHint) { urlHint.style.display = "none"; urlHint.textContent = ""; }
       convertLocalFiles = (t.input.files || []).slice();
     } else {
       if (blockInput) blockInput.classList.add("link-only");
       clearLocalFiles();
-      if (inputUrl) inputUrl.value = t.input.label || "";
+      toast("该任务来源为在线文档，本版本已不再支持在线文档", "warn");
     }
   }
-  applyOnlineLinkGate(_loginOk);   // 回显来源 → 摘掉 no-login
-  syncCopyUrlBtn();
   renderUploadList();
   resetConvScroll();   // 复位到顶部：恢复快照不是「跟随流」，滚到底会把用户扔到过程区末尾
   // 恢复任务视图：第④步「开始转换」发起区保持隐藏（仅在新建表单显示）；重跑由右上角「重新转换」承担
@@ -5797,13 +5657,9 @@ function showConvPageMsg(msg, type) {
   scrollConvBottom();
 }
 
-// 输入区（链接 / 上传）的提示也走页面内联，不弹 toast
+// 输入区（链接 / 上传）的提示也走页面内联；在线链接已移除，改走 toast
 function showUrlHint(msg, type) {
-  const el = document.getElementById("url-hint");
-  if (!el) return;
-  el.textContent = msg;
-  el.style.display = "";
-  el.className = "url-hint" + (type === "err" ? " err" : type === "ok" ? " ok" : "");
+  if (msg) toast(msg, type);
 }
 
 async function uploadConvertFile(f) {
@@ -5831,7 +5687,7 @@ async function uploadConvertFile(f) {
 async function doConvert() {
   const built = buildConvertInputs();
   if (!built) {
-    showConvPageMsg(onlineLinkShown() ? "请先粘贴在线文档链接，或选择本地文件" : "在线文档排版需先登录；也可选择本地文件", "err");
+    showConvPageMsg("请先选择本地文件", "err");
     return;
   }
 
@@ -5880,21 +5736,9 @@ async function doConvert() {
     renderTplPick();
   }
 
-  // 在线文档源 + 未登录：先弹授权再继续（本地文件转换不需要登录，不拦）。
-  // 必须放在模型服务前置检查**之前** —— 未登录时内置服务本来也不可用，先认证才不至于报「请配置模型服务」这种误导文案。
-  // 授权成功：doLogin 已刷新登录态，继续往下跑；若授权页把主窗口导航走了，则由「授权中断恢复」按 pending 续跑（故先把恢复所需信息存全）。
-  if (built.inputType === "link" && !_loginOk) {
-    const ok = await doLogin({
-      inputType: built.inputType, inputs: built.inputs, label: built.label, files: built.files,
-      tsFile: selFile, tsName: currentTsName, checked: checked.slice(),
-      checkedNames: selectedTplNames(tsFiltered.templates, checked),
-    });
-    if (!ok) { showConvPageMsg("未授权，已取消转换（在线文档需先扫码登录）", "err"); return; }
-  }
-
   // LLM 前置检查：转换主链路依赖 LLM，未配置直接提示——不发起任务、不产生历史记录
   if (!(await checkLlmConfigured())) {
-    showConvPageMsg("文档排版需配置模型服务：请扫码登录使用内置服务，或到「设置」启用一个模型服务", "err");
+    showConvPageMsg("文档排版需配置模型服务：请到「设置」启用一个模型服务", "err");
     return;
   }
 
@@ -6481,27 +6325,8 @@ async function doConvert() {
       if (focusedRunId === runId) appendFailBlock(streamFriendly, msg);
       else toast("任务「" + (task.input && task.input.label || "转换") + "」失败：" + t, "err");
     };
-    if (needsAuth(e.message)) {
-      if (focusedRunId === runId) appendLine("⏳", "需要授权，正在打开授权窗…");
-      else toast("任务「" + (task.input && task.input.label || "转换") + "」需要授权，正在打开授权窗…", "err");
-      const ok = await doLogin({
-        inputType: built.inputType, inputs: built.inputs, label: built.label, files: built.files,
-        tsFile: selFile, tsName: currentTsName, checked: checked.slice(), checkedNames: selectedTplNames(tsFiltered.templates, checked),
-        inheritAttrs: inheritAttrsRun.slice(), recognizeLeadParagraph: recognizeLeadRun, reviewEnabled: reviewRun,
-        nameCheck: nameCheckRun, nameRosters: nameRostersRun.slice(),
-      });
-      if (ok) {
-        // 重跑前重置上一轮的错误/完成快照：streamError 不清会导致"重跑成功却抛旧错误"
-        streamError = null; doneData = null; streamFriendly = null;
-        try { await runStream(built.inputs); stopTimers(); if (streamError) throw new Error(streamError); }
-        catch (e2) { showErr(streamError || e2.message); }
-      } else {
-        showErr("未授权，转换取消");
-      }
-    } else {
-      // 优先用 SSE error 事件带回的后端文案（唯一一次显示点）
-      showErr(streamError || e.message || "未知错误");
-    }
+    // 优先用 SSE error 事件带回的后端文案（唯一一次显示点）
+    showErr(streamError || e.message || "未知错误");
     task.running = false;
     task.done = true;
     if (convState === task) { convState.running = false; convState.completedAway = (currentView !== "convert"); }
@@ -6617,19 +6442,15 @@ async function doConvert() {
 }
 
 // ═══════════════════════════════════════════
-// 登录流程（转换时按需自动调用）
+// 登录流程已移除（本版只处理本地文档上传）。以下保留空实现避免历史引用报错。
 // ═══════════════════════════════════════════
-// 需要认证的错误（转换时自动触发授权）
+// 需要认证的错误（登录已移除，恒 false；错误走普通分支）
 function needsAuth(errMsg) {
-  return /登录|扫码|授权|权限|1770032|NEED_LOGIN|NEED_CREDENTIALS/.test(errMsg || "");
+  return false;
 }
 
-// 确保已登录：已扫码授权（user token）返回 true；否则弹授权窗并轮询等待（最多约 90s）。
-// 注意：应用凭证配置（configured）≠ 已登录——扫码是正常通道，未扫码必须弹出授权窗。
-//
-// pending：授权中断后待继续的转换参数（链接/模板集/勾选/格式选项）。授权页在主窗口内
-// 导航会卸载本页（doLogin 的轮询随之失效），所以触发授权前先把 pending 落盘 localStorage；
-// 登录成功切回主应用时 launcher 带 ?resume=1，由 maybeResumePendingConvert 恢复并自动继续。
+// 确保已登录：已移除，直接返回 false（不再打开授权窗）。
+// pending 落盘/恢复机制保留，但不再用于在线文档链接。
 const PENDING_CONVERT_KEY = "klunl_pending_convert";
 function savePendingConvert(p) {
   try { localStorage.setItem(PENDING_CONVERT_KEY, JSON.stringify(Object.assign({ savedAt: Date.now() }, p || {}))); } catch (e) { /* 忽略 */ }
@@ -6645,89 +6466,15 @@ function clearPendingConvert() {
   try { localStorage.removeItem(PENDING_CONVERT_KEY); } catch (e) { /* 忽略 */ }
 }
 async function doLogin(pending) {
-  const st = await refreshStatus().catch(() => null);
-  if (st && st.login && st.login.ok && st.login.mode === "user-oauth") return true;
-  toast("需要授权，正在打开授权窗（请在窗口点「授权」或用手机扫码）…");
-  try {
-    if (pending) savePendingConvert(pending);   // 授权窗导航会卸载本页，先落盘供 reload 后恢复
-    await api("/api/login", { method: "POST" });
-    let tries = 0;
-    while (tries++ < 45) {
-      await new Promise(r => setTimeout(r, 2000));
-      const st2 = await refreshStatus().catch(() => null);
-      if (st2 && st2.login && st2.login.ok && st2.login.mode === "user-oauth") {
-        renderLoginEntry(st2.login);
-        // 登录成功 → 强制换一次内置凭证（登录会换凭证，必须绕过缓存复用），拿到后刷新内置卡
-        api("/api/llm/builtin/refresh", { method: "POST" })
-          .then(r => { if (r && r.builtin) { llmBuiltin = r.builtin; renderBuiltinCard(); } })
-          .catch(() => {});
-        toast("✓ 授权成功", "ok");
-        return true;
-      }
-    }
-    toast("授权超时，请重试", "err");
-    return false;
-  } catch (e) {
-    toast("授权启动失败：" + e.message, "err");
-    return false;
-  }
+  // 登录功能已移除：直接视为未授权，调用方应给出本地文件提示。
+  return false;
 }
 
-// 扫码授权中断恢复：授权页在主窗口内导航 → 本页被卸载、doLogin 轮询失效；
-// launcher 登录成功切回主应用时带 ?resume=1。重载后据此恢复输入/模板选择并自动继续转换。
+// 扫码授权中断恢复：登录功能已移除，直接清除遗留的 pending（不再恢复在线文档链接）。
 async function maybeResumePendingConvert() {
   const pending = loadPendingConvert();
   if (!pending) return;
-  // 过期兜底（>6h 视为陈旧，避免下次启动还弹恢复提示/误续跑）
-  if (pending.savedAt && (Date.now() - pending.savedAt) > 6 * 3600 * 1000) { clearPendingConvert(); return; }
-  const isResume = /[?&]resume=1/.test(location.search);
-  const st = await refreshStatus().catch(() => null);
-  const loggedIn = !!(st && st.login && st.login.ok && st.login.mode === "user-oauth");
-  // 恢复输入源：链接（授权中断场景只会是链接；本地文件路径已在磁盘，不恢复）
-  // 未登录不恢复链接：链接入口此时隐藏（见 applyOnlineLinkGate），恢复了既看不见也用不上，
-  // 落盘记录留在原处，登录后再次进入会照常恢复。
-  const urlInput = document.getElementById("input-url");
-  const restoredLink = !!(loggedIn && pending.inputType === "link" && urlInput);
-  if (restoredLink) {
-    urlInput.value = pending.inputs[0] || "";
-    syncCopyUrlBtn();
-    clearLocalFiles();
-    onUrlInput();
-    applyInheritDisabled();
-  }
-  // 恢复模板集选择 + 勾选模板（refreshConvertView 按 forceFile 选中集，tpl-pick 读勾选表）
-  if (pending.tsFile) {
-    window.__tplPickChecked = window.__tplPickChecked || {};
-    window.__tplPickCheckedNames = window.__tplPickCheckedNames || {};
-    window.__tplPickChecked[pending.tsFile] = pending.checked || [];
-    window.__tplPickCheckedNames[pending.tsFile] = pending.checkedNames || [];
-    await refreshConvertView(pending.tsFile, false);
-  } else {
-    await refreshConvertView(null, false);
-  }
-  // 恢复格式处理勾选（bold/charSpacing 在 inheritAttrs；lead/review/namecheck 是独立布尔开关，缺省 = 默认值），随后 doConvert 顶部快照
-  if (Array.isArray(pending.inheritAttrs)) applyInheritPrefs(pending.inheritAttrs);
-  const boolFmtRestore = [
-    ["lead", pending.recognizeLeadParagraph],
-    ["review", pending.reviewEnabled],
-    ["namecheck", pending.nameCheck],     // 授权中断续跑：把「勾了姓名校对、选了哪几份名单」一并还原
-  ];
-  boolFmtRestore.forEach(([key, flag]) => {
-    if (typeof flag !== "boolean") return;
-    const inp = document.querySelector(`#inherit-grid input[value="${key}"]`);
-    if (inp) inp.checked = flag;
-  });
-  syncRosterPickVisible();
-  if (Array.isArray(pending.nameRosters)) applyRosterSelection(pending.nameRosters);
-  if (isResume && loggedIn) {
-    clearPendingConvert();           // 只续跑一次：清除后即使再刷新也不会重复触发
-    toast("✓ 授权成功，继续转换…", "ok");
-    await doConvert();
-  } else if (isResume) {
-    toast(restoredLink ? "授权未完成：已恢复转换输入，请重新点击「开始转换」扫码" : "授权未完成：请先登录，再粘贴在线文档链接", "err");
-  } else if (restoredLink) {
-    toast("已恢复上次未完成的转换输入", "");
-  }
+  clearPendingConvert();   // 本地文件路径已在磁盘，不恢复在线文档链接
 }
 
 // ═══════════════════════════════════════════
@@ -8160,7 +7907,7 @@ async function writeTemplateToSet(tpl, fileName, tsFile, activate, extraDefs) {
 async function doImport(file, tsFile) {
   // LLM 前置检查：导入依赖 LLM 分类，未配置直接提示——不发起导入、不产生左侧菜单占位
   if (!(await checkLlmConfigured())) {
-    toast("导入模板需配置模型服务：请扫码登录使用内置服务，或到「设置」启用一个模型服务", "err");
+    toast("导入模板需配置模型服务：请到「设置」启用一个模型服务", "err");
     return;
   }
   // 模板样本前置大小检查（与后端 /api/import-docx 同阈值）：模板是学格式的样本，正常都很小，超限直接拒绝
@@ -8517,11 +8264,10 @@ async function loadLlmList() {
     const r = await api("/api/llms");
     llmServices = r.services || [];
     llmEnabledId = r.defaultServiceId || "";
-    llmBuiltin = r.builtin || null;
-    llmUseBuiltin = r.useBuiltin !== false;
+    llmBuiltin = null;
+    llmUseBuiltin = false;
     state.nodeUseEnvProxy = !!r.nodeUseEnvProxy;
     state.systemProxyEnabled = !!r.systemProxyEnabled;
-    renderBuiltinCard();
     renderLlmList();
     renderLlmProxyStatus();
   } catch (e) {
@@ -8530,129 +8276,32 @@ async function loadLlmList() {
 }
 
 // ═══════════════════════════════════════════
-// 设置页：内置服务卡（凭证随登录态获取，见 docs/内置Key与登录认证设计方案.md）
-// state 四态：ready 可用 / needLogin 未登录 / none 取不到 / unknown 探测中
-// 启用开关：单一启用位之一——内置与自配服务互斥，同一时刻只有一个处于启用状态
+// 内置服务卡已移除（登录功能已禁用）。保留空实现避免历史引用报错。
 // ═══════════════════════════════════════════
 function renderBuiltinCard() {
   const box = document.getElementById("builtin-card");
-  if (!box) return;
-  const b = llmBuiltin || { state: "unknown", name: "内置服务", model: "" };
-  const ST = {
-    ready:    { cls: "on",      text: "✓ 可用" },
-    needLogin:{ cls: "off",     text: "未登录" },
-    none:     { cls: "warn",    text: "不可用" },
-    unknown:  { cls: "neutral", text: "检测中…" },
-  };
-  const st = ST[b.state] || ST.unknown;
-
-  // 开关状态 = 凭证就绪 且 用户启用；凭证未就绪时开关禁用（开了也拿不到 Key，只会让人误以为能用）
-  const usable = b.state === "ready";
-  const active = llmBuiltinOn();
-
-  // 状态补充说明：明确"现在实际用哪个"，避免用户以为内置不可用就没模型可用
-  let hint;
-  if (active) hint = "";
-  else if (usable) hint = "已停用，改用当前启用的自配模型服务。";
-  else if (b.state === "needLogin") hint = "登录后自动获取模型凭证；也可以直接启用下方自配的模型服务。";
-  else if (b.state === "none") hint = "取不到内置凭证（未登录、网络不通或凭证不完整），请启用下方自配的模型服务。";
-  else hint = "正在检测内置凭证…";
-
-  const modelText = b.model || "（未取到模型名）";
-  // 底部行：提示句（占满剩余宽度）+ 右侧操作按钮。
-  // 按钮口径 = 未登录给「登录」，其余状态给「测试」（未登录时测试必然失败，不给这种按钮）
-  const opsHtml = b.state === "needLogin"
-    ? '<button class="small" data-bact="login">登录</button>'
-    : '<button class="small" data-bact="test">测试</button>';
-  const footHtml = `<div class="builtin-foot">
-        ${hint ? `<span class="builtin-hint">${esc(hint)}</span>` : ""}
-        <span class="llm-ops">${opsHtml}</span>
-      </div>`;
-  box.innerHTML = `
-    <div class="llm-card builtin-card${active ? " is-on" : ""}">
-      <div class="llm-card-head">
-        <span class="llm-card-name">${esc(b.name || "内置服务")}</span>
-        <span class="builtin-state ${st.cls}">${esc(st.text)}</span>
-        <span class="builtin-toggle">
-          <span class="builtin-toggle-label">启用</span>
-          <label class="switch" title="${usable ? "启用后同一时刻不再使用其他模型服务" : "凭证就绪后才可启用"}">
-            <input type="checkbox" id="builtin-switch" ${active ? "checked" : ""} ${usable ? "" : "disabled"}>
-            <span class="slider"></span>
-          </label>
-        </span>
-      </div>
-      <div class="llm-meta">
-        <div class="llm-meta-item" title="${esc(modelText)}"><code>${esc(modelText)}</code></div>
-      </div>
-      ${footHtml}
-      <div class="test-result" data-res="__builtin__" style="display:none"></div>
-    </div>`;
-
-  box.querySelectorAll("button[data-bact]").forEach(btn => {
-    btn.addEventListener("click", () => onBuiltinAction(btn.dataset.bact, btn));
-  });
-  const sw = document.getElementById("builtin-switch");
-  if (sw) sw.addEventListener("change", () => onBuiltinToggle(sw.checked));
+  if (box) box.innerHTML = "";
 }
 
-/** 内置服务当前是否生效：凭证就绪（已登录）且启用开关打开 —— 单一启用位里"内置占了位" */
+/** 内置服务当前是否生效：已移除，恒 false */
 function llmBuiltinOn() {
-  return !!(llmBuiltin && llmBuiltin.available && llmUseBuiltin);
+  return false;
 }
 
-/** 是否存在已启用且可用的模型：内置（已登录 + 已启用）或自配（当前启用的那一个）。
+/** 是否存在已启用且可用的模型：自配（当前启用的那一个）。
  * 全站"是否已配置模型"的闸门统一走这里——开关是唯一判据（关掉即视为未配置）。 */
 function llmConfigured() {
-  if (llmBuiltinOn()) return true;
   return llmServices.some(s => s.id === llmEnabledId);
 }
 
-/** 内置服务启用开关：落 llms.json 顶层，持久、跨登录（开启即交出其他服务的启用位） */
+/** 内置服务启用开关：已移除，保留空实现 */
 async function onBuiltinToggle(on) {
-  try {
-    const r = await api("/api/llms/use-builtin", { method: "POST", body: JSON.stringify({ on }) });
-    llmUseBuiltin = r.useBuiltin !== false;
-    llmBuiltin = r.builtin || llmBuiltin;
-    renderBuiltinCard();
-    renderLlmList();   // 内置占了/让了启用位，自配卡的开关要跟着重画
-    toast(on ? "已启用内置服务" : "已停用内置服务");
-  } catch (e) {
-    toast("切换失败：" + e.message, "err");
-    loadLlmList();   // 回滚 UI 到服务端实际状态
-  }
+  // 无内置服务，不做任何事
 }
 
-// 内置卡动作：未登录时的「登录」（与侧栏底部登录入口同一条链）、凭证就绪后的「测试」。
-// 重新登录 = 侧栏菜单里先退出、再点登录（旧令牌权限=旧授权页 scope，刷新令牌不带新权限）。
+// 内置卡动作：已移除，保留空实现
 async function onBuiltinAction(act, btn) {
-  if (act === "test") {
-    btn.disabled = true;
-    const orig = btn.textContent;
-    btn.textContent = "测试中…";
-    try {
-      const r = await api("/api/llm/builtin/test", { method: "POST", body: "{}" });
-      // 测试可能顺带刷新了凭证状态（none → ready）：先按最新状态重画卡，再把结果写回
-      // （重画会重建结果区，所以顺序不能颠倒，且要重新取节点）
-      if (r && r.builtin) { llmBuiltin = r.builtin; renderBuiltinCard(); }
-      showTestResult(document.querySelector('[data-res="__builtin__"]'), r);
-    } catch (e) {
-      showTestResult(document.querySelector('[data-res="__builtin__"]'), { ok: false, message: "测试失败：" + e.message });
-    } finally {
-      btn.disabled = false;
-      btn.textContent = orig;
-    }
-    return;
-  }
-  if (act !== "login") return;
-  btn.disabled = true;
-  btn.textContent = "打开授权窗口…";
-  try {
-    await api("/api/login", { method: "POST" });   // 主窗口导航到授权页，扫码后带 ?resume=1 切回
-  } catch (e) {
-    btn.disabled = false;
-    btn.textContent = "登录";
-    toast("登录失败：" + e.message, "err");
-  }
+  // 无内置服务，不做任何事
 }
 
 /** 渲染代理通道提示（常显，描述连通性，与 LLM 能力开关无关）。
@@ -8686,12 +8335,11 @@ function renderLlmList() {
     box.innerHTML = "";
     return;
   }
-  const builtinOn = llmBuiltinOn();     // 内置占了启用位 → 所有自配卡一律显示为停用
   box.innerHTML = llmServices.map(svc => {
     const keyText = svc.apiKey && svc.apiKey.hasKey ? ("****" + svc.apiKey.keyTail) : "未填 Key";
     const model = svc.models && svc.models.length ? (svc.models.find(m => m.isDefault) || svc.models[0]) : null;
     const modelText = model ? model.name : "（未设置）";
-    const on = !builtinOn && svc.id === llmEnabledId;
+    const on = svc.id === llmEnabledId;
     return `
     <div class="llm-card${on ? " is-on" : ""}">
       <div class="llm-card-head">
@@ -9524,8 +9172,6 @@ function llmDemoEl(id) { return document.getElementById(id); }
 
 /** 当前启用的服务 + 模型 徽标文案 */
 function llmDemoModelText() {
-  // 内置启用（已登录）优先：此时自配卡的开关全部是关的，徽标不能显示自配
-  if (llmBuiltinOn()) return llmBuiltin.name + (llmBuiltin.model ? " · " + llmBuiltin.model : "");
   const svc = llmServices.find(s => s.id === llmEnabledId);
   if (!svc) return "";
   const m = svc.models && svc.models.length ? (svc.models.find(x => x.isDefault) || svc.models[0]) : null;
@@ -9544,7 +9190,7 @@ function llmDemoRefreshGate() {
     const t = llmDemoModelText();
     badge.textContent = t ? "当前：" + t : "";
   }
-  if (!ok) llmDemoSetStatus("尚未启用模型服务：请扫码登录使用内置服务，或到「设置」页启用一个模型", "warn");
+  if (!ok) llmDemoSetStatus("尚未启用模型服务：请到「设置」页启用一个模型", "warn");
 }
 
 function llmDemoSetStatus(html, cls) {
@@ -9644,7 +9290,7 @@ async function llmDemoSend() {
   const promptEl = llmDemoEl("llmd-prompt");
   const prompt = (promptEl.value || "").trim();
   if (!prompt) { toast("请输入提示词", "warn"); return; }
-  if (!llmConfigured()) { toast("尚未启用模型服务：请扫码登录使用内置服务，或到「设置」页启用一个模型", "err"); return; }
+  if (!llmConfigured()) { toast("尚未启用模型服务：请到「设置」页启用一个模型", "err"); return; }
 
   // ── 重置面板 ──
   llmDemoAbort = new AbortController();
@@ -10005,18 +9651,10 @@ async function init() {
     tasksListExpanded = !tasksListExpanded;
     renderTasks();
   });
-  // 启动只取一次 /api/status：模板集树与登录入口共用这一份响应（此前两处相邻各取一次，纯浪费）
+  // 启动只取一次 /api/status：模板集树依赖这份响应
   let st;
   try { st = await refreshStatus(); }
   catch (e) { setStatus("✗ 无法连接服务", "err"); return; }
-  const initLogin = await refreshLoginStatus(st);
-  // 已登录 → 强制换一次内置凭证（登录会换凭证，必须绕过缓存复用）。首取要跨两跳内网网关，
-  // 不 await、不阻塞启动；拿到最终态后刷新设置页内置卡。
-  if (initLogin && initLogin.ok) {
-    api("/api/llm/builtin/refresh", { method: "POST" })
-      .then(r => { if (r && r.builtin) { llmBuiltin = r.builtin; renderBuiltinCard(); } })
-      .catch(() => {});
-  }
   // 全局样式库已移除：无「内置默认」概念（样式随模板集走）
   renderSetTree(st);
   // 根图标
@@ -10024,14 +9662,6 @@ async function init() {
   document.getElementById("ic-convert").innerHTML = ICONS.convert;
   document.getElementById("ic-tools").innerHTML = ICONS.docWord;
   document.getElementById("ic-settings").innerHTML = ICONS.settings;
-  // 侧栏底部登录入口（图标由 renderLoginEntry 填，此处补事件）
-  const navLogin = document.getElementById("nav-login");
-  if (navLogin) {
-    navLogin.addEventListener("click", () => onNavLogin());
-    navLogin.addEventListener("keydown", e => {
-      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onNavLogin(); }
-    });
-  }
 
   // 左侧菜单折叠按钮（方案 C 图标）+ 画布过窄自动折叠
   bindSidebarCollapse();
@@ -10041,7 +9671,7 @@ async function init() {
   document.querySelectorAll(".nav-item").forEach(n => {
     n.addEventListener("click", e => {
       if (e.target.closest(".nav-dots")) return;
-      if (!n.dataset.view) return;   // 底部登录入口无 data-view，走自己的 handler
+      if (!n.dataset.view) return;
       if (n.dataset.view === "design") {
         // 模板集菜单项：仅展开/折叠子菜单（模板集列表），不切换右侧视图、不清空当前模板
         document.getElementById("sets-tree").classList.toggle("collapsed");
@@ -10180,36 +9810,7 @@ async function init() {
   const descBtn = document.getElementById("btn-tpl-desc");
   if (descBtn) descBtn.addEventListener("click", editTemplateDesc);
 
-  const urlInput = document.getElementById("input-url");
-  urlInput.addEventListener("keydown", e => { if (e.key === "Enter") doConvert(); });
-  // 复制链接：把输入框内容写入剪贴板；输入框为空时按钮禁用（下方 syncCopyUrlBtn 同步）
-  const copyUrlBtn = document.getElementById("btn-copy-url");
-  if (copyUrlBtn) {
-    copyUrlBtn.addEventListener("click", () => {
-      const v = (urlInput.value || "").trim();
-      if (!v) { toast("链接为空，无可复制", "err"); return; }
-      const done = () => toast("已复制链接");
-      const fallback = () => {
-        urlInput.focus();
-        urlInput.select();
-        try { document.execCommand("copy"); done(); } catch (e) { toast("复制失败", "err"); }
-        urlInput.setSelectionRange(urlInput.value.length, urlInput.value.length);
-      };
-      if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(v).then(done).catch(fallback);
-      } else fallback();
-    });
-  }
-  syncCopyUrlBtn();
-  // 链接输入即清空本地文件（二者互斥，只保留一种）；并保留「已有任务」提示
-  urlInput.addEventListener("input", () => {
-    const blockInput = document.getElementById("block-input");
-    if (blockInput) blockInput.classList.remove("link-only", "local-only");
-    if (urlInput.value.trim()) clearLocalFiles();
-    onUrlInput();
-    applyInheritDisabled();   // 源类型变化 → 同步③卡片置灰
-    syncCopyUrlBtn();         // 链接为空 → 「复制链接」按钮置灰
-  });
+  // 在线文档链接输入已移除，仅保留本地上传（上传区事件见下方）
 
   // 方案A：上传区点击 / 拖拽 → 选本地文件（多选），上传落盘后列入清单
   const uploadZone = document.getElementById("upload-zone");
@@ -10222,7 +9823,6 @@ async function init() {
   const addLocalFiles = async (files) => {
     const arr = Array.from(files || []);
     if (!arr.length) return;
-    clearLink();
     const blockInput = document.getElementById("block-input");
     if (blockInput) blockInput.classList.remove("link-only", "local-only");
     let added = 0;

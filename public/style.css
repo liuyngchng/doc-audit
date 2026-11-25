@@ -127,14 +127,9 @@ body, button, input, select, textarea, .modal, .toolbar, .convert-card, .props-p
 /* 历史任务输入源唯一显示：链接任务只保留链接框（隐藏上传区）；本地任务只保留文件列表（隐藏链接框） */
 #block-input.link-only #upload-zone,
 #block-input.link-only .fmt-hint { display: none; }
-/* local-only 时链接框与「复制链接」按钮一起隐藏（无链接可复制，留着是空按钮） */
+/* local-only 时在线文档链接框与「复制链接」按钮已移除（本版仅本地上传） */
 #block-input.local-only .url-row,
 #block-input.local-only #url-hint { display: none; }
-/* no-login 未登录态：在线文档链接入口整行隐藏（输入框 + 链接格式提示），只留本地上传。
-   链接入口依赖登录态，未登录时它不成立——露着只会让人贴了链接才发现要授权 */
-#block-input.no-login .url-row,
-#block-input.no-login .url-fmt-line,
-#block-input.no-login #url-hint { display: none; }
 
 /* 文档链接 / 输出模板：着色子卡片，便于区分 */
 .convert-block.block-link,
@@ -2394,8 +2389,6 @@ button.danger:hover { background: rgba(239,68,68,.08); border-color: var(--err);
 .sidebar-bottom .nav-item { flex: 1; min-width: 0; }
 .sidebar.collapsed .sidebar-bottom { flex-direction: column; gap: 2px; }
 .sidebar.collapsed .sidebar-bottom .nav-item { flex: none; }
-/* 已登录：图标转成功后绿——状态用颜色表示，不额外加字（与全站"色彩优先于文字"一致） */
-.nav-login.logged .nav-icon { color: var(--ok); }
 
 /* 文档排版菜单尾部：历史保留期提示（参考截图：居中、小灰字、破折号包裹） */
 .convert-history-tip {

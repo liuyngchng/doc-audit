@@ -51,13 +51,8 @@
     </div>
   </nav>
 
-  <!-- 底部入口（固定在侧边栏最下方）：登录 + 设置
-       展开态并排、登录在设置左侧；折叠态竖排——56px 扣掉内边距只剩 40px，放不下两个 32px 图标 -->
+  <!-- 底部入口（固定在侧边栏最下方）：设置 -->
   <div class="sidebar-bottom">
-    <div class="nav-item nav-login" id="nav-login" role="button" tabindex="0" aria-label="登录">
-      <span class="nav-icon" id="ic-login"></span>
-      <span class="nav-label" id="lbl-login">登录</span>
-    </div>
     <div class="nav-item" data-view="settings" id="nav-settings">
       <span class="nav-icon" id="ic-settings"></span>
       <span class="nav-label">设置</span>
@@ -112,22 +107,10 @@
           <div class="card-title">文档排版</div>
         </div>
 
-        <!-- ① 输入文档：方案 A（链接行 + 上传区，二者互斥；支持多选本地文件） -->
-        <!-- no-login = 未登录的新建任务态（在线文档链接入口隐藏，见 style.css）。
-             摘掉它的两种情况：①登录后 ②回显任务来源时（历史/聚焦任务的在线文档源照常展示）→ applyOnlineLinkGate -->
-        <div class="convert-block block-link no-login" id="block-input">
+        <!-- ① 输入文档：仅本地上传（在线文档链接入口已移除） -->
+        <div class="convert-block block-link" id="block-input">
           <div class="block-label"><span class="step-badge">1</span>输入文档</div>
           <div class="block-summary" id="input-summary" title="点击展开"></div>
-          <div class="url-row">
-            <input id="input-url" type="text" name="document-url"
-                   placeholder="粘贴在线文档链接 / doc-id"
-                   autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-                   data-lpignore="true" aria-label="在线文档链接">
-            <button type="button" id="btn-copy-url" title="复制输入框中的链接">复制链接</button>
-          </div>
-          <!-- 输入框下格式提示行（登录状态已移至侧栏底部登录入口） -->
-          <div class="url-fmt-line">支持链接：在线文档 / WPS 文档· 云盘文件支持 Word（docx / doc）</div>
-          <div class="url-hint" id="url-hint" style="display:none"></div>
           <div class="upload-zone" id="upload-zone" tabindex="0" role="button" aria-label="选择本地文件或拖拽到此处">
             <div class="upload-hint" id="upload-hint">
               <span class="upload-ic">📁</span>
@@ -136,7 +119,7 @@
             <div class="upload-list" id="upload-list"></div>
           </div>
           <input type="file" id="convert-file-input" accept=".docx,.doc,.txt,.md,.json" multiple style="display:none">
-          <div class="fmt-hint">支持格式：docx · doc · txt · md · json（在线文档源快照）</div>
+          <div class="fmt-hint">支持格式：docx · doc · txt · md · json（文档源快照）</div>
         </div>
 
         <!-- 模板集 + 模板 选择 -->
@@ -317,12 +300,7 @@
           <div class="card-title">模型服务</div>
         </div>
 
-        <!-- 模型服务列表：内置服务卡 + 自配服务卡平铺（无分组标题），
-             每张卡一个「启用」开关，同一时刻只有一个处于启用状态 -->
-        <div class="settings-section" id="builtin-llm-section">
-          <div id="builtin-card"></div>
-        </div>
-
+        <!-- 模型服务列表：自配服务卡平铺，每张卡一个「启用」开关，同一时刻只有一个处于启用状态 -->
         <div class="settings-section" id="llm-services-section">
           <div id="llm-list"></div>
         </div>

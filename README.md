@@ -21,7 +21,7 @@
 .
 ├── Dockerfile
 ├── docker-compose.yml
-├── docker-entrypoint.sh          # 容器入口：读 cfg.yml → 生成 llms.json → 启动服务
+├── entrypoint.sh                 # 容器入口：读 cfg.yml → 生成 llms.json → 启动服务
 ├── cfg.example.yml               # LLM 配置模板
 ├── .dockerignore
 ├── server/server.bundle.js       # 服务端（已 patch：监听 0.0.0.0）

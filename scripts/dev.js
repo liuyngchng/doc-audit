@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict'
 
-// 本地开发启动器：对齐 docker-entrypoint.sh 的行为
+// 本地开发启动器：对齐 entrypoint.sh 的行为
 //   1) 读 cfg.yml → 生成 data/config/llms.json
 //   2) 启动 server/server.bundle.js
 // 环境变量默认值见下，均可用环境变量覆盖。
