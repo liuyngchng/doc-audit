@@ -22,6 +22,22 @@ if [ -z "$VERSION" ]; then
   exit 1
 fi
 
+# 自动生成自签名证书（HTTPS 用）。已存在则跳过；证书不打进版本管理（.gitignore 已忽略 certs/）。
+CERT_DIR="certs"
+CERT_FILE="${CERT_DIR}/server.crt"
+KEY_FILE="${CERT_DIR}/server.key"
+if [ -f "$CERT_FILE" ] && [ -f "$KEY_FILE" ]; then
+  echo "==> 证书已存在，跳过生成（${CERT_FILE} / ${KEY_FILE}）"
+else
+  echo "==> 生成自签名证书（${CERT_FILE} / ${KEY_FILE}）"
+  mkdir -p "$CERT_DIR"
+  openssl req -x509 -newkey rsa:2048 -nodes \
+    -keyout "$KEY_FILE" -out "$CERT_FILE" \
+    -days 3650 \
+    -subj "/CN=doc-audit" \
+    -addext "subjectAltName=DNS:localhost,IP:127.0.0.1" >/dev/null 2>&1
+fi
+
 echo "==> 构建镜像 ${IMAGE_NAME}:${VERSION}"
 docker build -t "${IMAGE_NAME}:${VERSION}" .
 

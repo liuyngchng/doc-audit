@@ -43,12 +43,6 @@
     <div class="nav-tree collapsed" id="sets-tree"></div>
 
     <hr class="nav-sep">
-
-    <!-- Doc格式转换：辅助能力（.doc 批量转 .docx），与排版主线分开成一项 -->
-    <div class="nav-item" data-view="tools" id="nav-tools">
-      <span class="nav-icon" id="ic-tools"></span>
-      <span class="nav-label">Doc格式转换</span>
-    </div>
   </nav>
 
   <!-- 底部入口（固定在侧边栏最下方）：设置 -->
@@ -362,71 +356,6 @@
           <button type="button" class="sf-link" id="lnk-changelog">更新日志</button>
         </div>
       </footer>
-    </div>
-  </div>
-
-  <!-- ═══════════ 视图六：Doc格式转换（.doc 批量转 .docx） ═══════════ -->
-  <div id="view-tools" class="view hidden">
-    <div class="settings-wrap">
-
-      <div class="settings-card">
-        <div class="card-title-row">
-          <div class="card-title">.doc 批量转 .docx</div>
-          <div class="tools-badge" id="d2d-badge"></div>
-        </div>
-        <div class="card-hint">把老格式 .doc 另存为 .docx，保存在<b>源文件所在目录</b>、同名不同扩展名。转换由本机 Word 完成，保真度等同在 Word 里手动「另存为」，需要本机装有 Microsoft Word。</div>
-
-        <!-- 来源：一个框，两副面孔 —— 空态是入口（点击/拖入），选完就地变成摘要。
-             点击只做一件事：选文件夹（批量是主场景，文件夹选择框一次点击就能到位）。
-             按文件挑选与文件夹来源共用一个入口：把 .doc 文件直接拖进来即可。
-             拖入的真实路径由壳给出（页面把 File 对象交给 WebView2，壳读 get_Path，见 app.js d2dForwardFiles）。
-             摘要里带「含子文件夹」：这个开关的作用对象就是那个目录，放到「选项」行会离得太远而看不出在管谁。
-             默认勾选：选文件夹的批量场景基本都是"这一整棵树"，未勾选才是少数（取消后本会话一直保持取消）。 -->
-        <div class="tools-field">
-          <div class="tools-field-label">来源</div>
-          <div class="tools-field-body d2d-src">
-            <div class="upload-zone d2d-zone" id="d2d-zone" role="button" tabindex="0" aria-label="选择要转换的文件夹">
-              <div class="d2d-empty" id="d2d-empty">
-                <div class="upload-hint"><span class="upload-ic">📁</span><span id="d2d-zone-text">点击选择文件夹</span></div>
-                <div class="d2d-zone-note" id="d2d-zone-note">转换整个文件夹里的 .doc</div>
-              </div>
-              <div class="d2d-sel" id="d2d-sel" hidden>
-                <span class="d2d-sel-ic" id="d2d-sel-ic">📁</span>
-                <span class="d2d-sel-name" id="d2d-sel-name"></span>
-                <label class="tools-check d2d-sel-opt" id="d2d-recurse-wrap">
-                  <input type="checkbox" id="d2d-recurse" checked><span>含子文件夹</span>
-                </label>
-                <button type="button" class="uf-remove" id="d2d-clear" title="清除选择，重新选">✕</button>
-                <span class="d2d-sel-meta" id="d2d-sel-meta"></span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="tools-field">
-          <div class="tools-field-label">选项</div>
-          <div class="tools-field-body tools-opts">
-            <label class="tools-check"><input type="checkbox" id="d2d-force"><span>覆盖已存在的同名 .docx（不勾则跳过）</span></label>
-          </div>
-        </div>
-
-        <div class="tools-foot">
-          <span id="d2d-hint" class="tools-hint"></span>
-          <button id="d2d-start" class="primary big">开始转换</button>
-        </div>
-      </div>
-
-      <!-- 日志卡：跑过一次之后才出现（首屏不占位） -->
-      <div class="settings-card" id="d2d-log-card" hidden>
-        <div class="card-title-row">
-          <div class="card-title">转换记录</div>
-          <div class="tools-summary" id="d2d-summary"></div>
-        </div>
-        <!-- 记录是逐条 DOM 行（不是 <pre> 文本）：文件名要能点开它所在的目录，
-             文件可能散在多个子目录，逐行给「相对路径 + 打开」比一个总目录按钮有用。 -->
-        <div class="tools-log" id="d2d-log"></div>
-        <div class="tools-log-foot" id="d2d-log-foot"><span id="d2d-log-note"></span><button id="d2d-trash" class="small danger" hidden>删除 .doc 文档</button></div>
-      </div>
     </div>
   </div>
 

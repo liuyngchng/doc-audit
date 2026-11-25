@@ -23,8 +23,12 @@ COPY public ./public
 COPY config ./config
 COPY buildinfo.json ./
 
+# HTTPS 自签名证书（build.sh 生成；启动时由 server.bundle.js 读取）
+COPY certs ./certs
+
 # 监听地址与默认端口已内联进 server/server.bundle.js：
 #   zl 读取 DOC_AUDIT_BIND_HOST（默认 0.0.0.0），端口默认 30001。
+#   server 创建点已支持 TLS：有 DOC_AUDIT_TLS_CERT + DOC_AUDIT_TLS_KEY 时走 https，否则回退 http。
 # 无需在此处 sed patch。
 
 # 让容器可重载 config（cfg.yml 生成 llms.json 时会读这里）
@@ -36,7 +40,9 @@ VOLUME ["/data"]
 ENV DOC_AUDIT_DATA_DIR=/data \
     NO_BROWSER=1 \
     DOC_AUDIT_BIND_HOST=0.0.0.0 \
-    DOC_AUDIT_PORT=30001
+    DOC_AUDIT_PORT=30001 \
+    DOC_AUDIT_TLS_CERT=/app/certs/server.crt \
+    DOC_AUDIT_TLS_KEY=/app/certs/server.key
 
 EXPOSE 30001
 

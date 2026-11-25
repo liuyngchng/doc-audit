@@ -806,8 +806,6 @@ function switchView(name, clearConvert) {
   if (vl) vl.classList.toggle("hidden", name !== "llmdemo");
   const vi = document.getElementById("view-import");
   if (vi) vi.classList.toggle("hidden", name !== "import");
-  const vt = document.getElementById("view-tools");
-  if (vt) vt.classList.toggle("hidden", name !== "tools");
   if (name === "convert") {
     refreshConvertView(null, clearConvert);
     // 仅「从其他视图切回」时恢复最新任务的过程/结果（并行模型：不中断旧流）。
@@ -815,7 +813,6 @@ function switchView(name, clearConvert) {
     if (prevView !== "convert" && convTasks.length) restoreConvProcess();
   }
   if (name === "settings") { loadLlmList(); loadSeedStyles(); loadFontFamilies(); loadRosterSettings(); initSettingsFooter(); }
-  if (name === "tools") { d2dProbe(); }
   if (name === "llmdemo") loadLlmList().then(llmDemoRefreshGate);
   // 视图切换后，依据新的激活态重渲染两侧树，确保选中高亮不跨区残留
   if (_lastTreeStatus) renderSetTree(_lastTreeStatus);
@@ -6392,8 +6389,7 @@ async function doConvert() {
       <div class="result-item">
         <span class="result-name">${esc(f.fileName)}</span>
         <span class="uf-size">${formatBytes(f.bytes)}</span>
-        <button type="button" class="open-folder-link" data-open-folder="${esc(f.rel || "")}">所在文件夹</button>
-        <button type="button" class="open-btn" data-open-file="${esc(f.rel || "")}"${f.rel ? "" : " disabled"}>打开</button>
+        <button type="button" class="open-btn" data-download="${esc(f.rel || "")}"${f.rel ? "" : " disabled"}>下载</button>
       </div>`).join("");
     // 快照：过程行（聚焦期间实时累积于 task.procHtml）+ 统计块；结果单独存
     const savedProcess = {
@@ -9660,7 +9656,6 @@ async function init() {
   // 根图标
   document.getElementById("ic-design").innerHTML = ICONS.design;
   document.getElementById("ic-convert").innerHTML = ICONS.convert;
-  document.getElementById("ic-tools").innerHTML = ICONS.docWord;
   document.getElementById("ic-settings").innerHTML = ICONS.settings;
 
   // 左侧菜单折叠按钮（方案 C 图标）+ 画布过窄自动折叠
@@ -9874,8 +9869,8 @@ async function init() {
   setTimeout(() => { refreshUpdateState(); checkForUpdate(false); }, 4000);
 }
 
-// ── 结果列表：直接打开产物 / 打开所在文件夹 ──
-// 产物本就在本机任务目录，无需先下载；事件委托挂在容器上，实时结果与历史任务快照（innerHTML 回显）同样生效。
+// ── 结果列表：下载产物（服务端部署，产物在服务端任务目录，浏览器需下载到本地）──
+// 事件委托挂在容器上，实时结果与历史任务快照（innerHTML 回显）同样生效。
 // 历史快照里保存的 resultHtml 是早期版本（含 a.download-link、无打开按钮）→ 渲染前用 upgradeResultItems 升级为新结构。
 function upgradeResultItems(rl) {
   if (!rl) return;
@@ -9891,32 +9886,28 @@ function upgradeResultItems(rl) {
     const open = document.createElement("button");
     open.type = "button";
     open.className = "open-btn";
-    open.setAttribute("data-open-file", rel);
+    open.setAttribute("data-download", rel);
     if (!rel) open.disabled = true;
-    open.textContent = "打开";
+    open.textContent = "下载";
     item.appendChild(open);
   });
 }
 function bindResultActions() {
   const rl = document.getElementById("result-list");
   if (!rl) return;
-  async function openResult(rel, mode) {
+  function downloadResult(rel) {
     if (!rel) return;
-    try {
-      const r = await fetch("/api/open", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ f: rel, mode }),
-      });
-      const d = await r.json().catch(() => ({}));
-      if (!r.ok || !d.ok) toast(d.error || "打开失败", "err");
-    } catch (e) { toast("打开失败：" + e.message, "err"); }
+    // 服务端部署：走 /api/download 流式下载（Content-Disposition: attachment 触发浏览器保存）
+    const a = document.createElement("a");
+    a.href = "/api/download?f=" + encodeURIComponent(rel);
+    a.download = "";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
   }
   rl.addEventListener("click", e => {
-    const btnFile = e.target.closest("[data-open-file]");
-    if (btnFile) { openResult(btnFile.getAttribute("data-open-file"), "file"); return; }
-    const btnDir = e.target.closest("[data-open-folder]");
-    if (btnDir) openResult(btnDir.getAttribute("data-open-folder"), "folder");
+    const btn = e.target.closest("[data-download]");
+    if (btn) downloadResult(btn.getAttribute("data-download"));
   });
   // 首屏若已回显历史快照，立即升级一次
   upgradeResultItems(rl);
@@ -10471,7 +10462,6 @@ function bindFileDropGuard() {
 }
 
 bindFileDropGuard();
-bindToolsView();
 bindResultActions();
 
 init();

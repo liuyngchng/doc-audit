@@ -12,6 +12,9 @@ data/
 cfg.yml
 .cfg.yml
 
+# 自签名证书（本机生成，不入库；由 build.sh 自动生成）
+certs/
+
 # 日志
 *.log
 

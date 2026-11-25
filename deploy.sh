@@ -83,13 +83,15 @@ echo "==> 当前状态："
 $COMPOSE ps 2>/dev/null || docker ps --filter "name=doc-audit"
 
 # 自动探测本机 IP（IPv4），全部列出；取不到时回退 localhost。
+# 服务已启用 HTTPS（自签名证书），故用 https:// 前缀。
 echo "==> 访问地址："
 IPS="$( (hostname -I 2>/dev/null || ip -4 -o addr show scope global 2>/dev/null || true) \
   | tr ' ' '\n' | grep -oE '([0-9]{1,3}\.){3}[0-9]{1,3}' | grep -v '^127\.' | sort -u )"
 if [ -n "$IPS" ]; then
   echo "$IPS" | while read -r ip; do
-    echo "    http://${ip}:${PORT}"
+    echo "    https://${ip}:${PORT}"
   done
 else
-  echo "    http://localhost:${PORT}"
+  echo "    https://localhost:${PORT}"
 fi
+echo "    （自签名证书，首次访问需在浏览器信任该证书）"
