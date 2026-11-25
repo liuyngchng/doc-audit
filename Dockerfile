@@ -23,9 +23,9 @@ COPY public ./public
 COPY config ./config
 COPY buildinfo.json ./
 
-# 锚点唯一：Bs=JD(),zl="127.0.0.1"  ->  zl 改成读取环境变量 DOC_AUDIT_BIND_HOST，默认 0.0.0.0
-RUN sed -i 's/zl="127\.0\.0\.1"/zl=process.env.DOC_AUDIT_BIND_HOST||"0.0.0.0"/' server/server.bundle.js \
-    && grep -c 'DOC_AUDIT_BIND_HOST' server/server.bundle.js
+# 监听地址与默认端口已内联进 server/server.bundle.js：
+#   zl 读取 DOC_AUDIT_BIND_HOST（默认 0.0.0.0），端口默认 30001。
+# 无需在此处 sed patch。
 
 # 让容器可重载 config（cfg.yml 生成 llms.json 时会读这里）
 RUN mkdir -p /app/config
@@ -36,9 +36,9 @@ VOLUME ["/data"]
 ENV DOC_AUDIT_DATA_DIR=/data \
     NO_BROWSER=1 \
     DOC_AUDIT_BIND_HOST=0.0.0.0 \
-    DOC_AUDIT_PORT=8765
+    DOC_AUDIT_PORT=30001
 
-EXPOSE 8765
+EXPOSE 30001
 
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh

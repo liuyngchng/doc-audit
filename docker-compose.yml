@@ -4,16 +4,17 @@ services:
     image: doc-audit:1.0.0
     container_name: doc-audit
     ports:
-      - "8765:8765"
+      - "30001:30001"
     environment:
       - DOC_AUDIT_DATA_DIR=/data
       - DOC_AUDIT_BIND_HOST=0.0.0.0
-      - DOC_AUDIT_PORT=8765
+      - DOC_AUDIT_PORT=30001
       # 如需把 cfg.yml 放到其它位置，解开下行并映射对应文件
       # - DOC_AUDIT_CFG=/cfg/cfg.yml
     volumes:
       # 数据持久化：模板、LLM 配置、任务产物、名单、历史
       - ./data:/data
-      # LLM 服务配置（OpenAI 兼容）
+      # LLM 服务配置（OpenAI 兼容）。
+      # 运行时挂载宿主机项目根目录的 cfg.yml；构建时不会打包进镜像（见 .dockerignore）。
       - ./cfg.yml:/cfg/cfg.yml:ro
     restart: unless-stopped

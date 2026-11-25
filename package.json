@@ -1,0 +1,14 @@
+{
+  "name": "doc-audit",
+  "version": "1.0.0",
+  "private": true,
+  "description": "文档审核服务（本地开发启动器，生产推荐 Docker）",
+  "scripts": {
+    "dev": "node scripts/dev.js",
+    "start": "node scripts/dev.js"
+  },
+  "dependencies": {
+    "@firecrawl/anydoc": "0.2.4",
+    "yaml": "^2.0.0"
+  }
+}

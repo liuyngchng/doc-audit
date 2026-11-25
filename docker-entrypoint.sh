@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-PORT="${DOC_AUDIT_PORT:-8765}"
+PORT="${DOC_AUDIT_PORT:-30001}"
 export PORT
 
 # 从 cfg.yml 生成 LLM 配置（OpenAI 兼容服务）。

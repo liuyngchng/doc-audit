@@ -33,6 +33,20 @@
 
 ## 三、快速开始
 
+### 0. 本地运行（可选，不依赖 Docker）
+
+> 需要 Node.js 20+。生产环境仍推荐 Docker（见下文）。
+
+```bash
+# 首次：安装依赖（@firecrawl/anydoc 原生绑定 + yaml）
+npm install
+
+# 启动（读取 cfg.yml → 生成 llms.json → 监听 0.0.0.0:30001）
+npm run dev
+```
+
+启动后访问 **http://localhost:30001**。可用环境变量覆盖默认值：`DOC_AUDIT_PORT`、`DOC_AUDIT_BIND_HOST`、`DOC_AUDIT_DATA_DIR`、`DOC_AUDIT_CFG`。
+
 ### 1. 准备 LLM 配置
 
 复制 `cfg.example.yml` 为 `cfg.yml`，填入你的 OpenAI 兼容服务：
@@ -64,7 +78,7 @@ docker compose up -d --build
 ```bash
 docker build -t doc-audit:1.0.0 .
 docker run -d --name doc-audit \
-  -p 8765:8765 \
+  -p 30001:30001 \
   -v "$PWD/data:/data" \
   -v "$PWD/cfg.yml:/cfg/cfg.yml:ro" \
   --restart unless-stopped \
