@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<!-- data-theme="light" 钉死亮色：本产品只有亮色主题，而 klui-tokens.css 在系统
+     暗色（prefers-color-scheme: dark）下会把 --kl-* 换成暗色值，kl 组件会变成
+     暗底压在亮界面上。显式声明 light 即走 [data-theme="light"] 那套。 -->
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>文档审核</title>
+<link rel="icon" href="icon-convert.png" type="image/png">
+<link rel="stylesheet" href="klui-tokens.css?v=1">
+<link rel="stylesheet" href="klui-components.css?v=2">
+<link rel="stylesheet" href="style.css?v=113">
+</head>
+<body>
+
+<!-- ════════════ 左侧导航菜单 ════════════ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand"><span class="brand-ic">📄</span><span class="brand-text">文档智能排版</span><div class="sidebar-collapse" id="sidebar-collapse" role="button" tabindex="0" title="折叠/展开菜单" aria-label="折叠/展开菜单">«</div></div>
+  <nav class="nav">
+    <!-- 文档排版：与「模板设计」一致，标题右侧提供 ＋ 新建入口 -->
+    <div class="nav-item active" data-view="convert" id="nav-convert">
+      <span class="nav-icon" id="ic-convert"></span>
+      <span class="nav-label">文档排版</span>
+      <button class="nav-dots" id="dots-convert-root" title="新建排版任务" aria-label="新建排版任务"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.7" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="6" x2="12" y2="18"/><line x1="6" y1="12" x2="18" y2="12"/></svg></button>
+    </div>
+    <div class="nav-tree" id="tasks-tree"></div>
+    <!-- 文档排版菜单尾部：历史保留期提示（参考截图样式） -->
+    <div class="convert-history-tip" title="仅显示最近 90 天的转换任务">— 为您保留最近 90 天历史记录 —</div>
+
+    <!-- 模块间分隔线（贯穿 sidebar 全宽，与 .sidebar-brand border-bottom、.sidebar-bottom border-top 风格一致） -->
+    <hr class="nav-sep">
+
+    <!-- 模板设计 -->
+    <div class="nav-item" data-view="design" id="nav-design">
+      <span class="nav-icon" id="ic-design"></span>
+      <span class="nav-label">模板设计</span>
+      <button class="nav-dots" id="dots-design-root" title="新建模板集" aria-label="新建模板集"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.7" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="6" x2="12" y2="18"/><line x1="6" y1="12" x2="18" y2="12"/></svg></button>
+    </div>
+    <!-- 默认折叠：模板集列表不占首屏；点「模板设计」标题展开/收起（见 app.js 的 nav-item handler） -->
+    <div class="nav-tree collapsed" id="sets-tree"></div>
+
+    <hr class="nav-sep">
+
+    <!-- Doc格式转换：辅助能力（.doc 批量转 .docx），与排版主线分开成一项 -->
+    <div class="nav-item" data-view="tools" id="nav-tools">
+      <span class="nav-icon" id="ic-tools"></span>
+      <span class="nav-label">Doc格式转换</span>
+    </div>
+  </nav>
+
+  <!-- 底部入口（固定在侧边栏最下方）：登录 + 设置
+       展开态并排、登录在设置左侧；折叠态竖排——56px 扣掉内边距只剩 40px，放不下两个 32px 图标 -->
+  <div class="sidebar-bottom">
+    <div class="nav-item nav-login" id="nav-login" role="button" tabindex="0" aria-label="登录">
+      <span class="nav-icon" id="ic-login"></span>
+      <span class="nav-label" id="lbl-login">登录</span>
+    </div>
+    <div class="nav-item" data-view="settings" id="nav-settings">
+      <span class="nav-icon" id="ic-settings"></span>
+      <span class="nav-label">设置</span>
+    </div>
+  </div>
+</aside>
+
+<!-- ════════════ 主内容区 ════════════ -->
+<main class="content">
+
+  <!-- ═══════════ 视图一：模板设计 ═══════════ -->
+  <div id="view-design" class="view hidden">
+    <main class="layout">
+      <!-- 中：预览 -->
+      <section class="preview-pane">
+        <div class="pane-title tpl-toolbar">
+          <div class="tpl-breadcrumb">
+            <span id="doc-title">模板设计：未选择模板集</span>
+            <span class="doc-sep" id="doc-sep">·</span>
+            <span class="doc-meta" id="doc-meta"></span>
+          </div>
+          <span class="tpl-actions" id="tpl-actions">
+            <button id="btn-tpl-desc" class="sample-btn" type="button" title="编辑当前模板的说明（悬停模板名时可见）">模板说明</button>
+            <button id="btn-open-sample" class="sample-btn" type="button">编辑样本</button>
+            <span id="tpl-save-status" class="tpl-status"></span>
+          </span>
+        </div>
+        <!-- v1.50 多页预览：页序列由 renderPreview 动态生成（.paper 下 N 个 .page），无静态单页 -->
+        <div class="paper" id="paper"></div>
+      </section>
+
+      <!-- 右：属性编辑（分组） -->
+      <section class="props-pane">
+        <!-- 样式（Word 风格：分类分组 + 手风琴展开编辑；页面/页码在「页面样式」组内） -->
+        <div class="prop-group">
+          <div class="pane-title" style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+            <span>样式</span>
+            <input type="search" id="style-search" class="style-search" placeholder="搜索样式"
+                   autocomplete="off" spellcheck="false" aria-label="搜索样式">
+          </div>
+          <div class="props-body" id="style-list"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ═══════════ 视图二：文档排版 ═══════════ -->
+  <div id="view-convert" class="view">
+    <div class="convert-wrap">
+      <div class="convert-card">
+        <div class="card-title-row">
+          <div class="card-title">文档排版</div>
+        </div>
+
+        <!-- ① 输入文档：方案 A（链接行 + 上传区，二者互斥；支持多选本地文件） -->
+        <!-- no-login = 未登录的新建任务态（在线文档链接入口隐藏，见 style.css）。
+             摘掉它的两种情况：①登录后 ②回显任务来源时（历史/聚焦任务的在线文档源照常展示）→ applyOnlineLinkGate -->
+        <div class="convert-block block-link no-login" id="block-input">
+          <div class="block-label"><span class="step-badge">1</span>输入文档</div>
+          <div class="block-summary" id="input-summary" title="点击展开"></div>
+          <div class="url-row">
+            <input id="input-url" type="text" name="document-url"
+                   placeholder="粘贴在线文档链接 / doc-id"
+                   autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                   data-lpignore="true" aria-label="在线文档链接">
+            <button type="button" id="btn-copy-url" title="复制输入框中的链接">复制链接</button>
+          </div>
+          <!-- 输入框下格式提示行（登录状态已移至侧栏底部登录入口） -->
+          <div class="url-fmt-line">支持链接：在线文档 / WPS 文档· 云盘文件支持 Word（docx / doc）</div>
+          <div class="url-hint" id="url-hint" style="display:none"></div>
+          <div class="upload-zone" id="upload-zone" tabindex="0" role="button" aria-label="选择本地文件或拖拽到此处">
+            <div class="upload-hint" id="upload-hint">
+              <span class="upload-ic">📁</span>
+              <span>点击选择文件，或拖拽到此处</span>
+            </div>
+            <div class="upload-list" id="upload-list"></div>
+          </div>
+          <input type="file" id="convert-file-input" accept=".docx,.doc,.txt,.md,.json" multiple style="display:none">
+          <div class="fmt-hint">支持格式：docx · doc · txt · md · json（在线文档源快照）</div>
+        </div>
+
+        <!-- 模板集 + 模板 选择 -->
+        <div class="convert-block block-output fixed-h" id="block-template">
+          <div class="block-label"><span class="step-badge">2</span>选择模板</div>
+          <div class="block-summary" id="template-summary" title="点击展开"></div>
+          <div class="tpl-grid">
+            <div class="tpl-col">
+              <div class="block-sub-label">模板集</div>
+              <div id="ts-pick" class="ts-pick"></div>
+            </div>
+            <div class="tpl-col">
+              <div class="block-sub-label" id="lbl-tpl-pick">模板</div>
+              <div id="tpl-pick" class="tpl-pick"></div>
+            </div>
+          </div>
+          <div class="login-hint" id="ts-hint" style="display:none"></div>
+        </div>
+
+        <!-- ③ 格式处理选项：段落结构 / 保留原文文字格式 / 内容处理 三组 -->
+        <!-- 文字格式组 = 后端继承白名单 8 项（bold/italic/underline/strike/color/bgColor/charSpacing/charScale）全接入，默认只开加粗 -->
+        <!-- block-output 复用通用卡片框线；block-inherit 给独立底色与 checkbox 视觉 -->
+        <div class="convert-block block-output block-inherit" id="block-inherit">
+          <div class="block-label"><span class="step-badge">3</span>格式处理选项</div>
+          <div class="block-summary" id="inherit-summary" title="点击展开"></div>
+          <div class="inherit-grid" id="inherit-grid">
+            <div class="inherit-group">
+              <div class="inherit-group-label">段落结构</div>
+              <div class="inherit-opt" data-key="lead">
+                <label class="opt-check">
+                  <input type="checkbox" value="lead" checked>
+                  <span class="opt-main">
+                    <span class="opt-name">识别段首标题句</span>
+                    <span class="opt-desc">识别「标题句 + 正文」同段版式，如：标题句楷体加粗、正文仿宋；不勾则整段按普通段落处理</span>
+                  </span>
+                </label>
+              </div>
+            </div>
+            <div class="inherit-group">
+              <div class="inherit-group-label">保留原文文字格式</div>
+              <div class="inherit-attrs">
+                <div class="inherit-opt compact" data-key="bold" title="源文档中加粗的重点词句，输出时套用「重点词语」样式保留加粗；不勾则忽略原文加粗、统一按模板输出">
+                  <label class="opt-check">
+                    <input type="checkbox" value="bold" checked>
+                    <span class="opt-main">
+                      <span class="opt-name">加粗</span>
+                    </span>
+                  </label>
+                </div>
+                <div class="inherit-opt compact" data-key="italic" title="保留原文斜体；不勾则忽略原文斜体">
+                  <label class="opt-check">
+                    <input type="checkbox" value="italic">
+                    <span class="opt-main">
+                      <span class="opt-name">斜体</span>
+                    </span>
+                  </label>
+                </div>
+                <div class="inherit-opt compact" data-key="underline" title="保留原文下划线；不勾则忽略原文下划线">
+                  <label class="opt-check">
+                    <input type="checkbox" value="underline">
+                    <span class="opt-main">
+                      <span class="opt-name">下划线</span>
+                    </span>
+                  </label>
+                </div>
+                <div class="inherit-opt compact" data-key="strike" title="保留原文删除线；不勾则忽略原文删除线">
+                  <label class="opt-check">
+                    <input type="checkbox" value="strike">
+                    <span class="opt-main">
+                      <span class="opt-name">删除线</span>
+                    </span>
+                  </label>
+                </div>
+                <div class="inherit-opt compact" data-key="color" title="保留原文字体颜色，蓝色链接等会一并带入正式文件，慎用">
+                  <label class="opt-check">
+                    <input type="checkbox" value="color">
+                    <span class="opt-main">
+                      <span class="opt-name">字体颜色</span>
+                    </span>
+                  </label>
+                </div>
+                <div class="inherit-opt compact" data-key="bgColor" title="保留原文底色与高亮，会带入终稿，慎用">
+                  <label class="opt-check">
+                    <input type="checkbox" value="bgColor">
+                    <span class="opt-main">
+                      <span class="opt-name">底色高亮</span>
+                    </span>
+                  </label>
+                </div>
+                <div class="inherit-opt compact" data-key="charSpacing" title="保留源字距（如 -2 磅），保证单行排布与源文件一致">
+                  <label class="opt-check">
+                    <input type="checkbox" value="charSpacing">
+                    <span class="opt-main">
+                      <span class="opt-name">字符间距</span>
+                    </span>
+                  </label>
+                </div>
+                <div class="inherit-opt compact" data-key="charScale" title="保留源字符缩放（如 95%），保证单行排布与源文件一致">
+                  <label class="opt-check">
+                    <input type="checkbox" value="charScale">
+                    <span class="opt-main">
+                      <span class="opt-name">字符缩放</span>
+                    </span>
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="inherit-group">
+              <div class="inherit-group-label">内容处理</div>
+              <div class="inherit-opt" data-key="review">
+                <label class="opt-check">
+                  <input type="checkbox" value="review" checked>
+                  <span class="opt-main">
+                    <span class="opt-name">内容校对</span>
+                    <span class="opt-desc">AI 校对错别字、语病、数字与标点、前后表述不一致及标题层级断档，修订以痕迹标出待你审阅；不勾则不改动文字</span>
+                  </span>
+                </label>
+              </div>
+              <!-- 人员姓名校对（默认关）：它比内容校对多一个前提——必须先有名单，缺省开会让没建名单的用户
+                   一进来就撞见"未执行"提示。勾上后就地展开名单选择（不弹窗）；名单本身在设置页维护。 -->
+              <div class="inherit-opt" data-key="namecheck">
+                <label class="opt-check">
+                  <input type="checkbox" value="namecheck">
+                  <span class="opt-main">
+                    <span class="opt-name">人员姓名校对</span>
+                    <span class="opt-desc">按名单核对文中人名的写法，同音字、形近字、缺字多字等写法出入</span>
+                  </span>
+                </label>
+                <div class="roster-pick" id="roster-pick" style="display:none">
+                  <div class="roster-pick-list" id="roster-pick-list"></div>
+                  <div class="roster-pick-hint" id="roster-pick-hint"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ④ 开始转换（动作按钮）+ 阶段二/三（过程/统计/下载结果，出现后不消失） -->
+        <div class="convert-block">
+          <div class="actions-row" id="actions-row">
+            <div class="step-action">
+              <span class="step-badge">4</span>
+              <button id="btn-convert" class="primary big">开始转换</button>
+            </div>
+          </div>
+          <div id="result-block" style="display:none">
+            <!-- 阶段二 · 转换过程（点击开始转换后出现；过程中/结束后均保留；转换统计合并于此卡内） -->
+            <div class="block-phase">
+              <div class="process-head-row">
+                <div class="block-label"><span class="step-badge">4</span>转换过程</div>
+                <div class="process-head-actions" id="process-head-actions">
+                  <!-- 停止（D4 拍板 2026-09-05）：仅聚焦任务进行中显示，中断本任务流 -->
+                  <button id="btn-stop-convert" class="small danger" style="display:none" title="停止当前转换">停止</button>
+                  <!-- 重新转换：进行中/已完成/历史查看 三态常驻过程卡右上角（JS 控制显隐与可点性） -->
+                  <button id="btn-reconvert" class="primary big" style="display:none" title="重新转换当前任务">重新转换</button>
+                </div>
+              </div>
+              <div id="conv-process" class="conv-process"></div>
+            </div>
+            <!-- 阶段三 · 下载结果（生成结束后出现，保留） -->
+            <div class="block-phase" id="result-phase" style="display:none">
+              <div class="block-label"><span class="step-badge">5</span>转换结果</div>
+              <div id="result-list"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ 视图三：设置 ═══════════ -->
+  <div id="view-settings" class="view hidden">
+    <div class="settings-wrap">
+
+      <!-- 卡片一：模型服务 -->
+      <div class="settings-card">
+        <div class="card-title-row">
+          <div class="card-title">模型服务</div>
+        </div>
+
+        <!-- 模型服务列表：内置服务卡 + 自配服务卡平铺（无分组标题），
+             每张卡一个「启用」开关，同一时刻只有一个处于启用状态 -->
+        <div class="settings-section" id="builtin-llm-section">
+          <div id="builtin-card"></div>
+        </div>
+
+        <div class="settings-section" id="llm-services-section">
+          <div id="llm-list"></div>
+        </div>
+
+        <!-- 卡片最底行：左代理状态（常驻提示）、右添加模型 -->
+        <div class="llm-bottom-row">
+          <div id="llm-proxy-diag" class="llm-proxy-diag"></div>
+          <button id="btn-add-llm" class="primary">＋ 添加模型</button>
+        </div>
+      </div>
+
+      <!-- 卡片二：人员名单（「人员姓名校对」的核对依据）
+           与其他卡片不同，这张是**可写**的：名单是纯用户数据，没有"出厂默认"可言（没有哪份名单
+           是所有用户共用的），故不放出厂文件、无「恢复出厂」，可自由增删改。
+           建几份、怎么分由用户自己定（按部门/按会议/就一份全单位），工具不预设分类、不设数量上限。
+           列表一行一份（名称 + 人数 + 编辑/删除），姓名全文在编辑弹窗里看和改。 -->
+      <div class="settings-card">
+        <div class="card-title-row">
+          <div class="card-title">人员名单</div>
+        </div>
+        <div class="card-hint">转换时勾选「人员姓名校对」，模型按名单核对文中人名，标出写法有出入之处（同音字、形近字、缺字多字）</div>
+        <div class="settings-section">
+          <div id="roster-list" class="roster-list"></div>
+          <div class="roster-actions">
+            <button id="btn-add-roster" class="primary">＋ 新建名单</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片三：默认样式（出厂基准，只读）：段落 / 表格 / 页面 / 字体映射 四组同卡，无编辑/写回入口。
+           字体映射组与清单同卡的理由：它决定清单里的字族落到哪个具体字体，是同一件事的两半；
+           开关作用域不止新建模板（还含模板导入、新建样式），故组内说明写明时机，不在卡页头重复。 -->
+      <div class="settings-card">
+        <div class="card-title-row">
+          <div class="card-title">默认样式</div>
+        </div>
+        <div class="card-hint">段落、表格、页面样式默认值，参考《党政机关公文格式》（GB/T 9704-2012）预置，只在新建模板、导入模板、新建样式决定字体取值，不影响已有模板</div>
+        <div class="settings-section">
+          <div id="seed-list" class="seed-list"></div>
+        </div>
+      </div>
+
+      <!-- 软件更新的入口不在这里：已统一收到侧栏底部的账号菜单里
+           （点账号 → 检查更新，右侧显示当前版本），与转录同一位置。
+           下载/校验/重启那套弹窗流程不变，见 app.js 的 checkForUpdate / openUpdateModal。
+           用户数据（模板、名单、术语、任务记录）都在用户态，更新不会改动。 -->
+
+      <!-- 页脚：软件信息 + 链接行（与设置页同构） -->
+      <footer class="settings-footer">
+        <div class="sf-name">文档审核 <span id="sf-version" class="sf-ver"></span><span id="sf-dev" class="sf-dev" hidden>开发版</span></div>
+        <div class="sf-copy">© <span id="sf-year">2026</span> 综合办公室</div>
+        <div class="sf-links">
+          <button type="button" class="sf-link" id="lnk-about">关于本软件</button>
+          <span class="sf-sep">·</span>
+          <button type="button" class="sf-link" id="lnk-onboarding">使用引导</button>
+          <span class="sf-sep">·</span>
+          <button type="button" class="sf-link" id="lnk-formats">支持格式</button>
+          <span class="sf-sep">·</span>
+          <button type="button" class="sf-link" id="lnk-changelog">更新日志</button>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <!-- ═══════════ 视图六：Doc格式转换（.doc 批量转 .docx） ═══════════ -->
+  <div id="view-tools" class="view hidden">
+    <div class="settings-wrap">
+
+      <div class="settings-card">
+        <div class="card-title-row">
+          <div class="card-title">.doc 批量转 .docx</div>
+          <div class="tools-badge" id="d2d-badge"></div>
+        </div>
+        <div class="card-hint">把老格式 .doc 另存为 .docx，保存在<b>源文件所在目录</b>、同名不同扩展名。转换由本机 Word 完成，保真度等同在 Word 里手动「另存为」，需要本机装有 Microsoft Word。</div>
+
+        <!-- 来源：一个框，两副面孔 —— 空态是入口（点击/拖入），选完就地变成摘要。
+             点击只做一件事：选文件夹（批量是主场景，文件夹选择框一次点击就能到位）。
+             按文件挑选与文件夹来源共用一个入口：把 .doc 文件直接拖进来即可。
+             拖入的真实路径由壳给出（页面把 File 对象交给 WebView2，壳读 get_Path，见 app.js d2dForwardFiles）。
+             摘要里带「含子文件夹」：这个开关的作用对象就是那个目录，放到「选项」行会离得太远而看不出在管谁。
+             默认勾选：选文件夹的批量场景基本都是"这一整棵树"，未勾选才是少数（取消后本会话一直保持取消）。 -->
+        <div class="tools-field">
+          <div class="tools-field-label">来源</div>
+          <div class="tools-field-body d2d-src">
+            <div class="upload-zone d2d-zone" id="d2d-zone" role="button" tabindex="0" aria-label="选择要转换的文件夹">
+              <div class="d2d-empty" id="d2d-empty">
+                <div class="upload-hint"><span class="upload-ic">📁</span><span id="d2d-zone-text">点击选择文件夹</span></div>
+                <div class="d2d-zone-note" id="d2d-zone-note">转换整个文件夹里的 .doc</div>
+              </div>
+              <div class="d2d-sel" id="d2d-sel" hidden>
+                <span class="d2d-sel-ic" id="d2d-sel-ic">📁</span>
+                <span class="d2d-sel-name" id="d2d-sel-name"></span>
+                <label class="tools-check d2d-sel-opt" id="d2d-recurse-wrap">
+                  <input type="checkbox" id="d2d-recurse" checked><span>含子文件夹</span>
+                </label>
+                <button type="button" class="uf-remove" id="d2d-clear" title="清除选择，重新选">✕</button>
+                <span class="d2d-sel-meta" id="d2d-sel-meta"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tools-field">
+          <div class="tools-field-label">选项</div>
+          <div class="tools-field-body tools-opts">
+            <label class="tools-check"><input type="checkbox" id="d2d-force"><span>覆盖已存在的同名 .docx（不勾则跳过）</span></label>
+          </div>
+        </div>
+
+        <div class="tools-foot">
+          <span id="d2d-hint" class="tools-hint"></span>
+          <button id="d2d-start" class="primary big">开始转换</button>
+        </div>
+      </div>
+
+      <!-- 日志卡：跑过一次之后才出现（首屏不占位） -->
+      <div class="settings-card" id="d2d-log-card" hidden>
+        <div class="card-title-row">
+          <div class="card-title">转换记录</div>
+          <div class="tools-summary" id="d2d-summary"></div>
+        </div>
+        <!-- 记录是逐条 DOM 行（不是 <pre> 文本）：文件名要能点开它所在的目录，
+             文件可能散在多个子目录，逐行给「相对路径 + 打开」比一个总目录按钮有用。 -->
+        <div class="tools-log" id="d2d-log"></div>
+        <div class="tools-log-foot" id="d2d-log-foot"><span id="d2d-log-note"></span><button id="d2d-trash" class="small danger" hidden>删除 .doc 文档</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ 视图四：导入 Word 文档生成模板（占满整个工作区，非弹窗） ═══════════ -->
+  <div id="view-import" class="view hidden">
+    <main class="layout import-layout">
+      <!-- 全窗结果大区（无预览） -->
+      <section class="import-result-pane" id="import-result-pane">
+        <div class="import-pane-head">
+          <span class="import-pane-title">导入 Word 文档生成模板</span>
+          <span class="doc-meta" id="import-doc-meta"></span>
+          <div class="import-actions">
+            <button id="import-stop" class="small danger" style="display:none">停止</button>
+            <button id="import-cancel" class="small">放弃</button>
+            <button id="import-ok" class="small primary" style="display:none">保存</button>
+          </div>
+        </div>
+        <div class="import-pane-body" id="import-body"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ═══════════ 视图五：LLM 演示（智能体式流式输出） ═══════════ -->
+  <div id="view-llmdemo" class="view hidden">
+    <div class="llmd-wrap">
+      <div class="llmd-card">
+        <div class="card-title-row">
+          <div class="card-title">智能体式流式输出</div>
+          <span class="llmd-model-badge" id="llmd-model-badge"></span>
+        </div>
+
+        <!-- 未启用提示 -->
+        <div id="llmd-disabled" class="llmd-disabled" style="display:none">
+          尚未配置 LLM 服务 → 请到「设置」页添加模型后使用。
+        </div>
+
+        <!-- 输入区 -->
+        <div class="llmd-input">
+          <textarea id="llmd-prompt" rows="3" placeholder="输入提示词，观察模型像智能体一样逐步输出：思考过程 → 工具调用 → 正文…"></textarea>
+          <div class="llmd-input-row">
+            <div class="llmd-examples">
+              <span class="llmd-example" data-p="只回复两个字：你好">快速测试</span>
+              <span class="llmd-example" data-p="先思考再回答：用三句话介绍端午节">思考过程</span>
+              <span class="llmd-example" data-p="请分步骤说明如何在浏览器里用 fetch 读取 SSE 流">长文示例</span>
+            </div>
+            <div class="llmd-actions">
+              <button id="btn-llmd-send" class="primary">发送</button>
+              <button id="btn-llmd-stop" class="small danger" style="display:none">停止</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 过程面板：思考过程 / 工具调用 / 输出 -->
+        <div class="llmd-process" id="llmd-process">
+          <details class="llmd-zone" id="llmd-think" open>
+            <summary>
+              <span class="llmd-zone-ic"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.4 1 2.3h6c0-.9.4-1.8 1-2.3A7 7 0 0 0 12 2z"/></svg></span>
+              <span class="llmd-zone-title">思考过程</span>
+              <span class="llmd-zone-badge" id="llmd-think-badge">0 字</span>
+            </summary>
+            <div class="llmd-zone-body think" id="llmd-think-body"></div>
+          </details>
+
+          <div class="llmd-zone" id="llmd-tools" style="display:none">
+            <div class="llmd-zone-head">
+              <span class="llmd-zone-ic"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span>
+              <span class="llmd-zone-title">工具调用</span>
+              <span class="llmd-zone-badge" id="llmd-tools-badge">0 次</span>
+            </div>
+            <div class="llmd-zone-body tools" id="llmd-tools-body"></div>
+          </div>
+
+          <div class="llmd-zone">
+            <div class="llmd-zone-head">
+              <span class="llmd-zone-ic"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+              <span class="llmd-zone-title">输出</span>
+              <span class="llmd-zone-badge" id="llmd-answer-badge">0 字</span>
+              <button id="btn-llmd-copy" class="small" style="display:none">复制</button>
+            </div>
+            <div class="llmd-zone-body answer" id="llmd-answer-body"></div>
+          </div>
+        </div>
+
+        <!-- 状态条 -->
+        <div class="llmd-status" id="llmd-status">就绪</div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<div id="toast" class="toast hidden"><span id="toast-msg" class="toast-msg"></span><button id="toast-close" class="toast-close" aria-label="关闭提示" title="关闭">×</button></div>
+<input type="file" id="file-input" accept=".docx" style="display:none">
+
+<!-- 首次启动使用引导层（独立于 #modal-overlay，避免与既有模态事件冲突） -->
+<div id="onboarding-overlay" class="onboarding-overlay hidden"></div>
+
+<!-- 自定义模态框 -->
+<div id="modal-overlay" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-title" id="modal-title"></div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-actions">
+      <button id="modal-cancel" class="small">取消</button>
+      <button id="modal-ok" class="small primary">确定</button>
+    </div>
+  </div>
+</div>
+
+<script src="signLayout.js?v=1"></script>
+<script src="styleAgg.js?v=2"></script>
+<script src="onboarding.js?v=3"></script>
+<script src="app.js?v=170"></script>
+</body>
+</html>

@@ -1,0 +1,274 @@
+{
+  "_comment": "默认样式的出厂基准（只读，无用户态覆盖层）。defaults.font 存国标字族语义名（小标宋 / 黑体 / 楷体 / 仿宋），写入模板时按 config/fonts.json 与「使用方正字库」开关落成具体字体名——此处刻意不写具体字体名，写了会让映射在「新建模板 / 从默认样式中选 / 重置样式」几条路上失效。defaults.pageFont 是例外：它不经映射、原样写入模板，所以这里直接写系统字体名「宋体」（页码国标 7.5 定死 4 号半角宋体，中文 Windows 一律自带，任何机器都不缺字；不跟开关走是为了避免落到「方正书宋简体」后、没装该字体的机器只能回退显示）。",
+  "styles": [
+    {
+      "key": "标题",
+      "category": "text",
+      "matchType": "special",
+      "match": "firstLine",
+      "mode": "whole",
+      "next": "副标题",
+      "defaults": {
+        "font": "小标宋",
+        "size": 22,
+        "align": "center",
+        "line": 32,
+        "bold": false,
+        "indentChars": 0,
+        "spaceBefore": 0,
+        "spaceAfter": 0
+      }
+    },
+    {
+      "key": "副标题",
+      "category": "text",
+      "matchType": "special",
+      "match": "subtitle",
+      "mode": "whole",
+      "next": "副标题",
+      "defaults": {
+        "font": "楷体",
+        "size": 16,
+        "align": "center",
+        "line": 28,
+        "bold": false,
+        "indentChars": 0,
+        "spaceBefore": 0,
+        "spaceAfter": 0
+      }
+    },
+    {
+      "key": "标题 1",
+      "category": "text",
+      "matchType": "regex",
+      "match": "^[一二三四五六七八九十]+、[^。：，]+$",
+      "mode": "whole",
+      "next": "正文段落",
+      "defaults": {
+        "font": "黑体",
+        "size": 16,
+        "align": "justify",
+        "line": 28,
+        "bold": false,
+        "indentChars": 2,
+        "spaceBefore": 0,
+        "spaceAfter": 0
+      }
+    },
+    {
+      "key": "标题 2",
+      "category": "text",
+      "matchType": "regex",
+      "match": "^（[一二三四五六七八九十]+）[^。：，]+$",
+      "mode": "whole",
+      "next": "正文段落",
+      "defaults": {
+        "font": "楷体",
+        "size": 16,
+        "align": "justify",
+        "line": 28,
+        "bold": false,
+        "indentChars": 2,
+        "spaceBefore": 0,
+        "spaceAfter": 0
+      }
+    },
+    {
+      "key": "标题 3",
+      "category": "text",
+      "matchType": "regex",
+      "match": "^[1-9]\\d*[\\.、][^。：，]+$|^（[1-9]\\d*）[^。：，]+$",
+      "mode": "whole",
+      "next": "正文段落",
+      "defaults": {
+        "font": "仿宋",
+        "size": 16,
+        "align": "justify",
+        "line": 28,
+        "bold": false,
+        "indentChars": 2,
+        "spaceBefore": 0,
+        "spaceAfter": 0
+      }
+    },
+    {
+      "key": "正文",
+      "category": "text",
+      "matchType": "none",
+      "match": "",
+      "mode": "whole",
+      "next": "正文",
+      "defaults": {
+        "font": "仿宋",
+        "size": 16,
+        "align": "justify",
+        "line": 28,
+        "bold": false,
+        "indentChars": 0,
+        "spaceBefore": 0,
+        "spaceAfter": 0
+      }
+    },
+    {
+      "key": "正文段落",
+      "category": "text",
+      "matchType": "special",
+      "match": "default",
+      "mode": "whole",
+      "next": "正文段落",
+      "defaults": {
+        "font": "仿宋",
+        "size": 16,
+        "align": "justify",
+        "line": 28,
+        "bold": false,
+        "indentChars": 2,
+        "spaceBefore": 0,
+        "spaceAfter": 0
+      }
+    },
+    {
+      "key": "标题引导段落",
+      "category": "text",
+      "matchType": "regex",
+      "match": "^[一二三四五六七八九十]+要|^第[一二三四五六七八九十]+，",
+      "mode": "lead",
+      "next": "正文段落",
+      "defaults": {
+        "font": "楷体",
+        "size": 16,
+        "align": "justify",
+        "line": 28,
+        "bold": true,
+        "indentChars": 2,
+        "spaceBefore": 0,
+        "spaceAfter": 0
+      }
+    },
+    {
+      "key": "表格标题",
+      "category": "text",
+      "matchType": "none",
+      "match": "",
+      "mode": "whole",
+      "next": "正文段落",
+      "defaults": {
+        "font": "黑体",
+        "size": 16,
+        "align": "center",
+        "line": 28,
+        "bold": false,
+        "indentChars": 0,
+        "spaceBefore": 0,
+        "spaceAfter": 0
+      }
+    },
+    {
+      "key": "称谓",
+      "category": "text",
+      "matchType": "special",
+      "match": "salutation",
+      "mode": "whole",
+      "next": "正文段落",
+      "defaults": {
+        "font": "仿宋",
+        "size": 16,
+        "align": "left",
+        "line": 28,
+        "bold": false,
+        "indentChars": 0,
+        "spaceBefore": 0,
+        "spaceAfter": 0
+      }
+    },
+    {
+      "key": "落款",
+      "category": "text",
+      "matchType": "special",
+      "match": "sign",
+      "mode": "whole",
+      "next": "正文段落",
+      "defaults": {
+        "font": "仿宋",
+        "size": 16,
+        "align": "right",
+        "line": 28,
+        "bold": false,
+        "indentChars": 0,
+        "spaceBefore": 0,
+        "spaceAfter": 0,
+        "rightIndentChars": 4
+      }
+    },
+    {
+      "key": "表头",
+      "category": "table",
+      "group": "数据表格",
+      "role": "表头",
+      "matchType": "none",
+      "match": "",
+      "mode": "whole",
+      "defaults": {
+        "font": "黑体",
+        "size": 14,
+        "align": "center",
+        "line": 28,
+        "bold": true,
+        "indentChars": 0,
+        "spaceBefore": 0,
+        "spaceAfter": 0
+      }
+    },
+    {
+      "key": "表格内容",
+      "category": "table",
+      "group": "数据表格",
+      "role": "内容",
+      "matchType": "none",
+      "match": "",
+      "mode": "whole",
+      "defaults": {
+        "font": "仿宋",
+        "size": 14,
+        "align": "justify",
+        "line": 28,
+        "bold": false,
+        "indentChars": 0,
+        "spaceBefore": 0,
+        "spaceAfter": 0
+      }
+    },
+    {
+      "key": "页面",
+      "category": "page",
+      "matchType": "none",
+      "match": "",
+      "mode": "whole",
+      "defaults": {
+        "width": 11906,
+        "height": 16838,
+        "marginTop": 2098,
+        "marginRight": 1474,
+        "marginBottom": 1984,
+        "marginLeft": 1587,
+        "linePitch": 579,
+        "numberGap": 7,
+        "pageFont": "宋体",
+        "pageSize": 14,
+        "pageAlign": "center"
+      }
+    },
+    {
+      "key": "重点词语",
+      "category": "char",
+      "matchType": "none",
+      "match": "",
+      "mode": "whole",
+      "defaults": {
+        "font": "楷体",
+        "size": "",
+        "bold": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,417 @@
+/* 本文件由 klUI 生成，请勿手改。
+   来源：klUI/components.go。重新生成： go run ./klUI/cmd/gentokens
+
+   引入顺序：tokens.css 在前，本文件在后（本文件引用 tokens.css 里的变量）。 */
+
+/* ── 按钮 ─────────────────────────────────────────────────────────
+   只给三个变体。共用基础模块不提供尺寸阶梯以外的东西：需要更小的按钮说明
+   那个界面本身该重新设计，而不是再多一个 .kl-btn--xs。 */
+
+.kl-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--kl-space-2);
+  min-height: var(--kl-space-8);
+  padding: 0 var(--kl-space-4);
+  border: 1px solid var(--kl-color-surface-border);
+  border-radius: var(--kl-radius-md);
+  background: var(--kl-color-surface-panel);
+  color: var(--kl-color-surface-text);
+  font-family: var(--kl-font-family-sans);
+  font-size: var(--kl-font-size-sm);
+  font-weight: var(--kl-font-weight-medium);
+  line-height: var(--kl-font-line-height-tight);
+  cursor: pointer;
+  transition: background var(--kl-duration-fast) ease, border-color var(--kl-duration-fast) ease;
+}
+
+.kl-btn:hover:not(:disabled) {
+  background: var(--kl-color-surface-panel-alt);
+  border-color: var(--kl-color-surface-border-strong);
+}
+
+.kl-btn:focus-visible {
+  outline: 2px solid var(--kl-color-brand-500);
+  outline-offset: 2px;
+}
+
+/* 禁用态必须真的"点不动"，不能只变灰 —— 变灰但仍然可点是最常见的一类误操作。 */
+.kl-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.kl-btn--primary {
+  background: var(--kl-color-brand-500);
+  border-color: var(--kl-color-brand-500);
+  color: var(--kl-color-surface-text-inverse);
+}
+
+.kl-btn--primary:hover:not(:disabled) {
+  background: var(--kl-color-brand-600);
+  border-color: var(--kl-color-brand-600);
+}
+
+.kl-btn--ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--kl-color-surface-text-muted);
+  padding: 0 var(--kl-space-2);
+}
+
+.kl-btn--ghost:hover:not(:disabled) {
+  background: var(--kl-color-surface-panel-alt);
+  color: var(--kl-color-surface-text);
+}
+
+.kl-btn--danger {
+  background: var(--kl-color-semantic-danger);
+  border-color: var(--kl-color-semantic-danger);
+  color: var(--kl-color-neutral-0);
+}
+
+/* ── 浮层与弹窗 ───────────────────────────────────────────────────
+   层级来自令牌：overlay 低于 modal，modal 低于 toast。这样"弹窗里弹一个确认框"
+   时，确认框天然压在上面；Toast 永远在最上面（它会被点掉，不该被遮住）。 */
+
+.kl-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--kl-z-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--kl-space-6);
+  background: var(--kl-color-surface-overlay);
+  animation: kl-fade-in var(--kl-duration-fast) ease both;
+}
+
+.kl-modal {
+  position: relative;
+  z-index: var(--kl-z-modal);
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  /* 32rem / 24rem 这类"内容宽"刻意不用令牌：space 是间距尺度不是宽高尺度，
+     拿 --kl-space-12（48px）当弹窗宽度会得到荒唐结果。令牌体系里没有尺寸档，
+     与其硬塞一个假的，不如写明这里是版式常量。 */
+  max-width: 32rem;
+  max-height: 80vh;
+  overflow: hidden;
+  border: 1px solid var(--kl-color-surface-border);
+  border-radius: var(--kl-radius-lg);
+  background: var(--kl-color-surface-panel);
+  box-shadow: var(--kl-shadow-lg);
+  animation: kl-slide-up var(--kl-duration-base) ease both;
+}
+
+.kl-modal__title {
+  margin: 0;
+  padding: var(--kl-space-5) var(--kl-space-6) var(--kl-space-2);
+  color: var(--kl-color-surface-text);
+  font-family: var(--kl-font-family-sans);
+  font-size: var(--kl-font-size-md);
+  font-weight: var(--kl-font-weight-semibold);
+  line-height: var(--kl-font-line-height-tight);
+}
+
+.kl-modal__body {
+  overflow: auto;
+  padding: var(--kl-space-2) var(--kl-space-6);
+  color: var(--kl-color-surface-text-muted);
+  font-size: var(--kl-font-size-sm);
+  line-height: var(--kl-font-line-height-normal);
+  /* 长 URL / 长路径必须能断行，否则会把弹窗顶宽（更新说明里全是链接）。 */
+  overflow-wrap: anywhere;
+}
+
+.kl-modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--kl-space-2);
+  padding: var(--kl-space-4) var(--kl-space-6) var(--kl-space-5);
+}
+
+/* ── 语气槽（Toast 与 Callout 共用）───────────────────────────────
+   四个修饰类只做变量赋值，不写任何落地属性 —— 理由见文件顶部
+   "四个修饰类为什么不写样式"。
+
+   注意 --kl-tone-* 是组件内部槽位、不是令牌，因此不参与
+   TestComponentsOnlyUseDefinedTokens 的校验：那条正则只认单参数形式
+   （var(变量名)），这里是带 fallback 的双参数形式。 */
+
+.kl-toast--success,
+.kl-callout--success {
+  --kl-tone: var(--kl-color-semantic-success);
+  --kl-tone-bg: var(--kl-color-semantic-success-bg);
+  --kl-tone-border: var(--kl-color-semantic-success-border);
+  --kl-tone-fg: var(--kl-color-semantic-success-text);
+}
+
+.kl-toast--info,
+.kl-callout--info {
+  --kl-tone: var(--kl-color-semantic-info);
+  --kl-tone-bg: var(--kl-color-semantic-info-bg);
+  --kl-tone-border: var(--kl-color-semantic-info-border);
+  --kl-tone-fg: var(--kl-color-semantic-info-text);
+}
+
+.kl-toast--warning,
+.kl-callout--warning {
+  --kl-tone: var(--kl-color-semantic-warning);
+  --kl-tone-bg: var(--kl-color-semantic-warning-bg);
+  --kl-tone-border: var(--kl-color-semantic-warning-border);
+  --kl-tone-fg: var(--kl-color-semantic-warning-text);
+}
+
+.kl-toast--error,
+.kl-callout--error {
+  --kl-tone: var(--kl-color-semantic-danger);
+  --kl-tone-bg: var(--kl-color-semantic-danger-bg);
+  --kl-tone-border: var(--kl-color-semantic-danger-border);
+  --kl-tone-fg: var(--kl-color-semantic-danger-text);
+}
+
+/* ── Toast ────────────────────────────────────────────────────────
+   行为规范见 docs/界面规范.md §3：最多 3 条、按严重程度给停留时长、
+   悬停暂停。样式只负责"看起来是哪种严重程度"。 */
+
+.kl-toast-stack {
+  position: fixed;
+  top: var(--kl-space-4);
+  right: var(--kl-space-4);
+  z-index: var(--kl-z-toast);
+  display: flex;
+  flex-direction: column;
+  gap: var(--kl-space-2);
+  /* 容器本身不挡鼠标：否则它会盖住右上角的关闭按钮 / 菜单。 */
+  pointer-events: none;
+}
+
+.kl-toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--kl-space-3);
+  min-width: 16rem;
+  max-width: 24rem;
+  padding: var(--kl-space-3) var(--kl-space-4);
+  /* 语气槽未赋值时（没有修饰类 = 中性提示）回退到中性面板，仍然是可用样式 ——
+     "忘了加修饰类"不该表现成透明无边框的一块。 */
+  border: 1px solid var(--kl-tone-border, var(--kl-color-surface-border));
+  border-radius: var(--kl-radius-md);
+  background: var(--kl-tone-bg, var(--kl-color-surface-panel));
+  box-shadow: var(--kl-shadow-md);
+  color: var(--kl-tone-fg, var(--kl-color-surface-text));
+  font-family: var(--kl-font-family-sans);
+  font-size: var(--kl-font-size-sm);
+  line-height: var(--kl-font-line-height-normal);
+  animation: kl-slide-in var(--kl-duration-base) ease both;
+}
+
+/* 图标用主色档，比正文亮一档：正文要够读，图标要"扫一眼能分辨"。
+   两者用同一档的结果是深绿图标压在浅绿底上完全不显眼 —— 这正是
+   满色块方案想解决却没解决的问题。 */
+.kl-toast__icon {
+  flex: none;
+  width: var(--kl-space-4);
+  height: var(--kl-space-4);
+  margin-top: 2px;
+  color: var(--kl-tone, var(--kl-color-surface-text-muted));
+}
+
+.kl-toast__body {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* 关闭按钮跟随语气色，不用固定的中性色：浅绿底上的中性灰发脏，
+   浅红底上的中性灰又太浅。inherit + 透明度在四种语气下都成立。 */
+.kl-toast__close {
+  flex: none;
+  padding: 0 var(--kl-space-1);
+  border: 0;
+  background: transparent;
+  color: inherit;
+  opacity: 0.55;
+  font-size: var(--kl-font-size-md);
+  line-height: var(--kl-font-line-height-tight);
+  cursor: pointer;
+  transition: opacity var(--kl-duration-fast) ease;
+}
+
+.kl-toast__close:hover {
+  opacity: 1;
+}
+
+/* ── 内联提示条（Callout）─────────────────────────────────────────
+   和 Toast 的区别不是"大小"，是**位置与生命周期**：
+   Toast 浮在最上层、会被点掉，说的是"刚刚发生了什么"；
+   Callout 长在内容里、跟着那块内容一起滚，说的是"这块内容你得先知道什么"。
+   典型用法：弹窗里的限制说明、表单上方的规则提醒、设置页里的"改了要重启"。
+
+   两者形态刻意一致（浅语义底 + 语义边 + 语义字），理由很实际：
+   同一条信息如果一会儿以 Toast 出现、一会儿以 Callout 出现，用户会当成两件事。
+   差异只有三处：没有关闭按钮、没有进出场动画、不进浮层层级。 */
+
+.kl-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--kl-space-3);
+  padding: var(--kl-space-3) var(--kl-space-4);
+  border: 1px solid var(--kl-tone-border, var(--kl-color-surface-border));
+  border-radius: var(--kl-radius-md);
+  background: var(--kl-tone-bg, var(--kl-color-surface-panel-alt));
+  color: var(--kl-tone-fg, var(--kl-color-surface-text));
+  font-family: var(--kl-font-family-sans);
+  font-size: var(--kl-font-size-sm);
+  line-height: var(--kl-font-line-height-normal);
+}
+
+.kl-callout__icon {
+  flex: none;
+  width: var(--kl-space-4);
+  height: var(--kl-space-4);
+  margin-top: 2px;
+  color: var(--kl-tone, var(--kl-color-surface-text-muted));
+}
+
+.kl-callout__body {
+  flex: 1 1 auto;
+  min-width: 0;
+  /* 提示条里常贴路径与 URL，不断行会把容器顶宽。 */
+  overflow-wrap: anywhere;
+}
+
+/* ── 更新卡 ───────────────────────────────────────────────────────
+   更新 UI 留在前端（M9 的本地 API 把检查/应用暴露成 HTTP），所以它需要一个
+   统一的"有版本、有进度、有按钮"的版式。 */
+
+.kl-update-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--kl-space-3);
+  padding: var(--kl-space-4);
+  border: 1px solid var(--kl-color-surface-border);
+  border-radius: var(--kl-radius-lg);
+  background: var(--kl-color-surface-panel);
+  box-shadow: var(--kl-shadow-sm);
+  font-family: var(--kl-font-family-sans);
+}
+
+.kl-update-card__title {
+  margin: 0;
+  color: var(--kl-color-surface-text);
+  font-size: var(--kl-font-size-base);
+  font-weight: var(--kl-font-weight-semibold);
+  line-height: var(--kl-font-line-height-tight);
+}
+
+.kl-update-card__meta {
+  color: var(--kl-color-surface-text-muted);
+  font-size: var(--kl-font-size-aux);
+  font-variant-numeric: tabular-nums;
+}
+
+.kl-update-card__notes {
+  max-height: 40vh;
+  overflow: auto;
+  color: var(--kl-color-surface-text-muted);
+  font-size: var(--kl-font-size-sm);
+  line-height: var(--kl-font-line-height-normal);
+  overflow-wrap: anywhere;
+}
+
+.kl-update-card__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--kl-space-2);
+}
+
+.kl-progress {
+  position: relative;
+  height: var(--kl-space-1);
+  overflow: hidden;
+  border-radius: var(--kl-radius-full);
+  background: var(--kl-color-neutral-200);
+}
+
+.kl-progress__bar {
+  height: 100%;
+  width: 0;
+  border-radius: var(--kl-radius-full);
+  background: var(--kl-color-brand-500);
+  transition: width var(--kl-duration-base) ease;
+}
+
+/* ── 转圈 ─────────────────────────────────────────────────────────
+   规范见 docs/界面规范.md §6。
+   「进行中」的唯一形态：所有产品、所有尺寸都走这一个类。
+   尺寸改 --kl-spinner-size；默认取 --kl-space-3，令牌缺失时回退 12px ——
+   只用到转圈的页面不必为了一个 12px 去引整份 tokens.css。
+   圆角同理回退 999px：这个件在「不引 tokens.css」的页面里也必须画得对。
+   颜色跟随 currentColor。
+
+   为什么是锥环而不是「浅色轨道 + 深色弧」：轨道不承载任何信息，头尾渐隐的弧更干净；
+   颜色跟随 currentColor ⇒ 深色按钮上照样看得清（两色写法在深底上必然糊成一团）。
+   mask 把中心掏空成环，老内核不支持 mask 时退化成渐变实心圆，不至于完全没有标记。
+
+   线宽 2px 与周期 1s 刻意不开放成参数：这两项决定「手感」，一旦可调，
+   各产品的转圈就会慢慢长得不一样。
+
+   注意 mask 里的 black：mask 只取 alpha 通道、颜色本身不显示，这里的 black 是
+   「不透明」的占位。用关键字而不是 #000，是因为「组件样式禁止硬编码色值」那条校验
+   管的是配色，而这里根本不是配色。 */
+.kl-spinner {
+  display: inline-block;
+  flex-shrink: 0;
+  width: var(--kl-spinner-size, var(--kl-space-3, 12px));
+  height: var(--kl-spinner-size, var(--kl-space-3, 12px));
+  border-radius: var(--kl-radius-full, 999px);
+  background: conic-gradient(from 90deg, transparent 5%, currentColor 92%);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), black calc(100% - 2px));
+          mask: radial-gradient(farthest-side, transparent calc(100% - 2px), black calc(100% - 2px));
+  animation: kl-spinner-rotate 1s linear infinite;
+}
+
+/* ── 动画 ─────────────────────────────────────────────────────────
+   prefers-reduced-motion 必须真的去掉位移：只把 duration 改成 0 会让
+   位移瞬间发生（跳一下），比有动画更难受。 */
+
+@keyframes kl-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes kl-slide-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes kl-slide-in {
+  from { opacity: 0; transform: translateX(16px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* 转圈：周期属于形状，不随尺寸变。 */
+@keyframes kl-spinner-rotate {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kl-overlay,
+  .kl-modal,
+  .kl-toast {
+    animation: none;
+  }
+  .kl-btn,
+  .kl-progress__bar {
+    transition: none;
+  }
+  /* 转圈是「在跑」的唯一信号，停掉会看成卡死 —— 只降速，不取消。 */
+  .kl-spinner {
+    animation-duration: 2.4s;
+  }
+}

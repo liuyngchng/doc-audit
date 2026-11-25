@@ -1,0 +1,1226 @@
+{
+  "factoryVersion": 3,
+  "name": "默认模板集",
+  "templates": [
+    {
+      "key": "impmto8eon3kzyc6y",
+      "name": "现场致辞",
+      "description": "现场致辞，字号放大",
+      "include": [
+        "标题",
+        "副标题",
+        "正文段落",
+        "称谓",
+        "页面",
+        "重点词语",
+        "标题 1",
+        "标题 2",
+        "标题 3",
+        "正文",
+        "标题引导段落"
+      ],
+      "styles": [
+        {
+          "key": "标题",
+          "category": "text",
+          "matchType": "special",
+          "match": "firstLine",
+          "mode": "whole",
+          "next": "副标题",
+          "defaults": {
+            "font": "方正小标宋简体",
+            "size": 22,
+            "align": "center",
+            "line": 32,
+            "bold": true,
+            "indentChars": 0,
+            "rightIndentChars": 0,
+            "spaceBefore": 0,
+            "spaceAfter": 0
+          }
+        },
+        {
+          "key": "副标题",
+          "category": "text",
+          "matchType": "special",
+          "match": "subtitle",
+          "mode": "whole",
+          "next": "副标题",
+          "defaults": {
+            "font": "方正楷体简体",
+            "size": 16,
+            "align": "center",
+            "line": 32,
+            "bold": false,
+            "indentChars": 0,
+            "rightIndentChars": 0,
+            "spaceBefore": 0,
+            "spaceAfter": 0
+          }
+        },
+        {
+          "key": "正文段落",
+          "category": "text",
+          "matchType": "special",
+          "match": "default",
+          "mode": "whole",
+          "next": "正文段落",
+          "defaults": {
+            "font": "方正仿宋简体",
+            "size": 18,
+            "align": "justify",
+            "line": 32,
+            "bold": false,
+            "indentChars": 2,
+            "rightIndentChars": 0,
+            "spaceBefore": 0,
+            "spaceAfter": 0
+          }
+        },
+        {
+          "key": "称谓",
+          "category": "text",
+          "matchType": "special",
+          "match": "salutation",
+          "mode": "whole",
+          "next": "正文段落",
+          "defaults": {
+            "font": "方正仿宋简体",
+            "size": 18,
+            "align": "left",
+            "line": 30,
+            "bold": true,
+            "indentChars": 0,
+            "rightIndentChars": 0,
+            "spaceBefore": 15,
+            "spaceAfter": 0,
+            "spaceBeforeUnit": "line",
+            "spaceAfterUnit": "pt"
+          }
+        },
+        {
+          "key": "页面",
+          "category": "page",
+          "matchType": "none",
+          "match": "",
+          "mode": "whole",
+          "defaults": {
+            "font": null,
+            "size": null,
+            "align": null,
+            "line": null,
+            "bold": false,
+            "indentChars": null,
+            "rightIndentChars": null,
+            "spaceBefore": 0,
+            "spaceAfter": 0,
+            "width": 11906,
+            "height": 16838,
+            "marginTop": 2098,
+            "marginRight": 1474,
+            "marginBottom": 1984,
+            "marginLeft": 1587,
+            "linePitch": 435,
+            "pageFont": "宋体",
+            "pageSize": 14,
+            "pageAlign": "center"
+          }
+        },
+        {
+          "key": "重点词语",
+          "category": "char",
+          "matchType": "none",
+          "match": "",
+          "mode": "whole",
+          "defaults": {
+            "font": "方正楷体简体",
+            "size": "",
+            "bold": true
+          }
+        },
+        {
+          "key": "标题 1",
+          "category": "text",
+          "matchType": "regex",
+          "match": "^[一二三四五六七八九十]+、[^。：，]+$",
+          "mode": "whole",
+          "next": "正文段落",
+          "defaults": {
+            "font": "方正黑体简体",
+            "size": 18,
+            "align": "justify",
+            "line": 32,
+            "bold": true,
+            "indentChars": 2,
+            "spaceBefore": 0,
+            "spaceAfter": 0
+          }
+        },
+        {
+          "key": "标题 2",
+          "category": "text",
+          "matchType": "regex",
+          "match": "^（[一二三四五六七八九十]+）[^。：，]+$",
+          "mode": "whole",
+          "next": "正文段落",
+          "defaults": {
+            "font": "方正楷体简体",
+            "size": 18,
+            "align": "justify",
+            "line": 32,
+            "bold": true,
+            "indentChars": 2,
+            "spaceBefore": 0,
+            "spaceAfter": 0
+          }
+        },
+        {
+          "key": "标题 3",
+          "category": "text",
+          "matchType": "regex",
+          "match": "^[1-9]\\d*[\\.、][^。：，]+$|^（[1-9]\\d*）[^。：，]+$",
+          "mode": "whole",
+          "next": "正文段落",
+          "defaults": {
+            "font": "方正仿宋简体",
+            "size": 18,
+            "align": "justify",
+            "line": 32,
+            "bold": true,
+            "indentChars": 2,
+            "spaceBefore": 0,
+            "spaceAfter": 0
+          }
+        },
+        {
+          "key": "正文",
+          "category": "text",
+          "matchType": "none",
+          "match": "",
+          "mode": "whole",
+          "next": "正文",
+          "defaults": {
+            "font": "方正仿宋简体",
+            "size": 18,
+            "align": "justify",
+            "line": 32,
+            "bold": false,
+            "indentChars": 0,
+            "spaceBefore": 0,
+            "spaceAfter": 0
+          }
+        },
+        {
+          "key": "标题引导段落",
+          "category": "text",
+          "matchType": "regex",
+          "match": "^[一二三四五六七八九十]+要|^第[一二三四五六七八九十]+，",
+          "mode": "lead",
+          "next": "正文段落",
+          "defaults": {
+            "font": "方正楷体简体",
+            "size": 18,
+            "align": "justify",
+            "line": 32,
+            "bold": true,
+            "indentChars": 2,
+            "spaceBefore": 0,
+            "spaceAfter": 0
+          }
+        }
+      ],
+      "styleOverrides": [],
+      "page": {
+        "width": 11905,
+        "height": 16840,
+        "marginTop": 1701,
+        "marginRight": 1361,
+        "marginBottom": 1587,
+        "marginLeft": 1361,
+        "linePitch": 299,
+        "numberGap": 7,
+        "marginHeader": 720,
+        "titlePage": false,
+        "oddEven": true,
+        "header": null,
+        "footer": {
+          "font": "方正仿宋简体",
+          "size": 12,
+          "variants": {
+            "default": [
+              {
+                "align": null,
+                "tabStops": [],
+                "runs": [
+                  {
+                    "t": "page",
+                    "kind": "current",
+                    "font": "宋体",
+                    "size": 14
+                  }
+                ]
+              }
+            ],
+            "first": null,
+            "even": null
+          }
+        },
+        "pageNumber": {
+          "format": "dash",
+          "align": "center",
+          "first": true
+        }
+      },
+      "sample": "[标题]\n在××××国际能源发展高峰论坛\n\n[标题]\n“AI驱动下的能源变革”平行论坛上的致辞\n\n[副标题]\n职务×××  姓名×××\n\n[副标题]\n（××××年××月××日）\n\n[称谓]\n尊敬的×××　总、各位领导、各位来宾：\n\n[正文段落]\n大家好！\n\n[正文段落]\n非常荣幸受邀参加本次国际能源发展高峰论坛，与各位油气、电力、科技企业和研究机构的朋友相聚于此，共同探讨“AI驱动下的能源变革”这一时代命题。首先，我谨代表×××公司，向长期以来关心支持×××发展的各位领导和朋友们、向论坛的主办方×××研究院表示衷心感谢！\n\n[正文段落]\n当前，我们正身处一场由人工智能引领的深刻变革之中。能源，作为现代社会的基石，其生产、储运、销售的每一个环节，都因AI的融入而焕发新的生机。这场变革不仅是技术的迭代，更是发展模式、产业生态乃至全球能源治理体系的重构。\n\n[正文段落]\n面对这场变革，我们看到，既有×××、×××等领军企业以其领先的技术能力与平台优势，为人工智能夯实模型和算力基础，也有×××等充满活力的新兴企业，在前沿模型的探索上不断创新突破，为技术发展注入新的力量；更有×××研究院等深耕行业的专业机构，将AI能力与能源领域的……\n"
+    },
+    {
+      "key": "impmtp2xzc1qe5t2w",
+      "name": "公文通知",
+      "description": "正式公文通知",
+      "include": [
+        "标题",
+        "标题 1",
+        "正文段落",
+        "标题引导段落",
+        "称谓",
+        "落款",
+        "页面",
+        "重点词语",
+        "版记左列",
+        "版记右列",
+        "发文单位",
+        "发文字号",
+        "副标题",
+        "标题 2",
+        "标题 3",
+        "正文"
+      ],
+      "styles": [
+        {
+          "key": "标题",
+          "category": "text",
+          "matchType": "special",
+          "match": "firstLine",
+          "mode": "whole",
+          "next": "正文段落",
+          "defaults": {
+            "font": "方正小标宋简体",
+            "size": 22,
+            "align": "center",
+            "line": 30,
+            "bold": true,
+            "indentChars": 0,
+            "rightIndentChars": 0,
+            "spaceBefore": 0,
+            "spaceAfter": 0,
+            "charSpacing": -10
+          }
+        },
+        {
+          "key": "标题 1",
+          "category": "text",
+          "matchType": "regex",
+          "match": "^[一二三四五六七八九十]+、[^。：，]+$",
+          "mode": "whole",
+          "next": "正文段落",
+          "defaults": {
+            "font": "方正黑体简体",
+            "size": 16,
+            "align": "justify",
+            "line": 28,
+            "bold": true,
+            "indentChars": 2,
+            "rightIndentChars": 0,
+            "spaceBefore": 0,
+            "spaceAfter": 0
+          }
+        },
+        {
+          "key": "正文段落",
+          "category": "text",
+          "matchType": "special",
+          "match": "default",
+          "mode": "whole",
+          "next": "正文段落",
+          "defaults": {
+            "font": "方正仿宋简体",
+            "size": 16,
+            "align": "justify",
+            "line": 28,
+            "bold": true,
+            "indentChars": 2,
+            "rightIndentChars": 0,
+            "spaceBefore": 0,
+            "spaceAfter": 0
+          }
+        },
+        {
+          "key": "标题引导段落",
+          "category": "text",
+          "matchType": "regex",
+          "match": "^[一二三四五六七八九十]+要|^第[一二三四五六七八九十]+，",
+          "mode": "lead",
+          "next": "正文段落",
+          "defaults": {
+            "font": "方正楷体简体",
+            "size": 16,
+            "align": "justify",
+            "line": 28,
+            "bold": true,
+            "indentChars": 2,
+            "rightIndentChars": 0,
+            "spaceBefore": 0,
+            "spaceAfter": 0
+          }
+        },
+        {
+          "key": "称谓",
+          "category": "text",
+          "matchType": "special",
+          "match": "salutation",
+          "mode": "whole",
+          "next": "正文段落",
+          "defaults": {
+            "font": "方正仿宋简体",
+            "size": 16,
+            "align": "left",
+            "line": 28,
+            "bold": true,
+            "indentChars": 0,
+            "rightIndentChars": 0,
+            "spaceBefore": 0,
+            "spaceAfter": 0
+          }
+        },
+        {
+          "key": "落款",
+          "category": "text",
+          "matchType": "special",
+          "match": "sign",
+          "mode": "whole",
+          "next": "正文段落",
+          "defaults": {
+            "font": "方正仿宋简体",
+            "size": 16,
+            "align": "right",
+            "line": 28,
+            "bold": true,
+            "indentChars": 0,
+            "rightIndentChars": 2,
+            "spaceBefore": 0,
+            "spaceAfter": 0
+          }
+        },
+        {
+          "key": "页面",
+          "category": "page",
+          "matchType": "none",
+          "match": "",
+          "mode": "whole",
+          "defaults": {
+            "font": null,
+            "size": null,
+            "align": null,
+            "line": null,
+            "bold": false,
+            "indentChars": null,
+            "rightIndentChars": null,
+            "spaceBefore": 0,
+            "spaceAfter": 0,
+            "width": 11906,
+            "height": 16838,
+            "marginTop": 2098,
+            "marginRight": 1474,
+            "marginBottom": 1984,
+            "marginLeft": 1587,
+            "linePitch": 435,
+            "pageFont": "宋体",
+            "pageSize": 14,
+            "pageAlign": "center"
+          }
+        },
+        {
+          "key": "重点词语",
+          "category": "char",
+          "matchType": "none",
+          "match": "",
+          "mode": "whole",
+          "defaults": {
+            "font": "方正楷体简体",
+            "size": "",
+            "bold": true
+          }
+        },
+        {
+          "key": "发文单位",
+          "category": "text",
+          "matchType": "none",
+          "match": "",
+          "mode": "whole",
+          "next": "正文段落",
+          "defaults": {
+            "font": "方正小标宋简体",
+            "size": 36,
+            "align": "center",
+            "line": null,
+            "lineMult": 1,
+            "bold": true,
+            "indentChars": 0,
+            "rightIndentChars": 0,
+            "spaceBefore": 7.8,
+            "spaceAfter": 0,
+            "color": "FF0000",
+            "charScale": 95,
+            "charSpacing": -40
+          }
+        },
+        {
+          "key": "发文字号",
+          "category": "text",
+          "matchType": "none",
+          "match": "",
+          "mode": "whole",
+          "next": "正文段落",
+          "defaults": {
+            "font": "方正仿宋简体",
+            "size": 16,
+            "align": "center",
+            "line": 24,
+            "bold": true,
+            "indentChars": 0,
+            "rightIndentChars": 0,
+            "spaceBefore": 0,
+            "spaceAfter": 0
+          }
+        },
+        {
+          "key": "版记左列",
+          "category": "table",
+          "group": "版记",
+          "role": "左列",
+          "matchType": "none",
+          "match": "",
+          "mode": "whole",
+          "defaults": {
+            "font": "方正仿宋简体",
+            "size": 14,
+            "align": "left",
+            "line": 25,
+            "bold": true,
+            "indentChars": 0,
+            "rightIndentChars": 0,
+            "spaceBefore": 0,
+            "spaceAfter": 0
+          }
+        },
+        {
+          "key": "版记右列",
+          "category": "table",
+          "group": "版记",
+          "role": "右列",
+          "matchType": "none",
+          "match": "",
+          "mode": "whole",
+          "defaults": {
+            "font": "方正仿宋简体",
+            "size": 14,
+            "align": "right",
+            "line": 25,
+            "bold": true,
+            "indentChars": 0,
+            "rightIndentChars": 0,
+            "spaceBefore": 0,
+            "spaceAfter": 0
+          }
+        },
+        {
+          "key": "副标题",
+          "category": "text",
+          "matchType": "special",
+          "match": "subtitle",
+          "mode": "whole",
+          "next": "副标题",
+          "defaults": {
+            "font": "方正楷体简体",
+            "size": 16,
+            "align": "center",
+            "line": 28,
+            "bold": false,
+            "indentChars": 0,
+            "spaceBefore": 0,
+            "spaceAfter": 0
+          }
+        },
+        {
+          "key": "标题 2",
+          "category": "text",
+          "matchType": "regex",
+          "match": "^（[一二三四五六七八九十]+）[^。：，]+$",
+          "mode": "whole",
+          "next": "正文段落",
+          "defaults": {
+            "font": "方正楷体简体",
+            "size": 16,
+            "align": "justify",
+            "line": 28,
+            "bold": true,
+            "indentChars": 2,
+            "spaceBefore": 0,
+            "spaceAfter": 0
+          }
+        },
+        {
+          "key": "标题 3",
+          "category": "text",
+          "matchType": "regex",
+          "match": "^[1-9]\\d*[\\.、][^。：，]+$|^（[1-9]\\d*）[^。：，]+$",
+          "mode": "whole",
+          "next": "正文段落",
+          "defaults": {
+            "font": "方正仿宋简体",
+            "size": 16,
+            "align": "justify",
+            "line": 28,
+            "bold": true,
+            "indentChars": 2,
+            "spaceBefore": 0,
+            "spaceAfter": 0
+          }
+        },
+        {
+          "key": "正文",
+          "category": "text",
+          "matchType": "none",
+          "match": "",
+          "mode": "whole",
+          "next": "正文",
+          "defaults": {
+            "font": "方正仿宋简体",
+            "size": 16,
+            "align": "justify",
+            "line": 28,
+            "bold": false,
+            "indentChars": 0,
+            "spaceBefore": 0,
+            "spaceAfter": 0
+          }
+        }
+      ],
+      "styleOverrides": [],
+      "page": {
+        "width": 11906,
+        "height": 16838,
+        "marginTop": 2098,
+        "marginRight": 1474,
+        "marginBottom": 1984,
+        "marginLeft": 1588,
+        "linePitch": 579,
+        "numberGap": 7,
+        "marginHeader": 851,
+        "titlePage": false,
+        "oddEven": true,
+        "header": null,
+        "footer": {
+          "font": "方正仿宋简体",
+          "size": 14,
+          "variants": {
+            "default": [
+              {
+                "align": "center",
+                "tabStops": [],
+                "runs": [
+                  {
+                    "t": "text",
+                    "text": "— ",
+                    "size": 14,
+                    "bold": true
+                  },
+                  {
+                    "t": "page",
+                    "kind": "current",
+                    "size": 14,
+                    "bold": true
+                  },
+                  {
+                    "t": "text",
+                    "text": " —",
+                    "size": 14,
+                    "bold": true
+                  }
+                ],
+                "outside": true
+              }
+            ],
+            "first": null,
+            "even": null
+          }
+        },
+        "pageNumber": {
+          "format": "dash",
+          "align": "outside",
+          "first": true
+        }
+      },
+      "sample": "[空行]\n\n[空行]\n\n[空行]\n\n[发文单位]\n×××公司文件\n\n[空行]\n\n[空行]\n\n[发文字号]\n××办〔××××〕号\n\n[红线]\n\n[空行]\n\n[标题]\n关于成立×××公司\n\n[标题]\n×××委员会的通知\n\n[空行]\n\n[称谓]\n各单位、各部门：\n\n[正文段落]\n为深入贯彻落实×××委关于规范中央企业采购管理的指导意见及集团公司招标管理工作要求，全面提升×××公司（以下简称公司）招标工作合规化、集约化、专业化、数智化水平，强化招标全流程风险防控，规范招标投标行为，防范廉政风险，促进招标业务高质量发展，依据《中华人民共和……\n\n[标题 1]\n一、委员会主要职责\n\n[正文段落]\n（一）贯彻执行国家招标投标法律法规、×××委及集团公司招标管理相关制度要求，审议公司年度招标工作计划，推动招标管理体系与集团管控体系、公司数字化转型战略深度融合。\n\n[正文段落]\n（二）统筹推进公司内外部招标投标资源整合，优化资源配置，推动招标工作集约化、专业化、标准化、数字化建设，提升招标工作质量、效率与效益，支撑公司业务高质量发展。\n\n[正文段落]\n（三）指导、协调公司总部及招标管理工作，监督招标管理制度执行情况，审核一、二类招标项目可不招标事项、邀请招标理由和依据，督促严格履行招标项目（含可不招标事项）审核、备案、公示等程序，确保招标活动依法合规、公开透明。\n\n[正文段落]\n（四）研究、协调解决公司招标投标工作中的重大问题、重点难点事项及重大争议纠纷；审议重大招标项目实施方案、评标委员会组成、评标结果及定标意见等关键事项；对达到集团管控标准的项目，按规定报审或备案。\n\n[标题 1]\n二、委员会人员组成\n\n[正文段落]\n主　任：×××\n\n[正文段落]\n副主任：×××　×××　×××　×××　×××\n\n[正文段落]\n　　　　×××\n\n[正文段落]\n成　员：×××　×××　×××　×××　×××\n\n[正文段落]\n　　　　×××　×××\n\n[正文段落]\n委员会下设×××办公室（以下简称招标办），作为日常办事机构，招标办设在×××中心，由×××兼任主任，×××兼任副主任。\n\n[正文段落]\n招标办主要职责：贯彻落实委员会决策部署；牵头招标日常管理、制度执行、业务协调、监督检查及专项工作组织实施；负责招标项目合规性审查、过程督导及资料归档；对接集团招标管理部门，按要求报送相关材料、配合监督检查。按季度组织委员会会议，通报招标工作重大事项，建立招标管……\n\n[标题 1]\n三、工作要求\n\n[标题引导段落]\n（一）提高政治站位，强化合规意识。各单位、各部门要充分认识规范招标管理对公司依法合规经营、降本增效、风险防控、廉政建设的重要意义，严格遵守国家法律法规、集团公司及公司招标管理各项相关规定，遵循“公开、公平、公正和诚实信用”原则，树立“守法、公开、竞争、择优、共……\n\n[标题引导段落]\n（二）严格制度执行，规范操作流程。严禁应招不招、化整为零、规避招标、虚假招标；严禁将应当公开招标的项目擅自改为邀请招标；严禁设置不合理资格条件排斥潜在投标人；严禁与招标代理机构、投标人、评审专家串通进行暗箱操作；严禁篡改招标结果、“招小送大”或订立背离合同实质……\n\n[标题引导段落]\n（三）健全工作机制，压实主体责任。委员会要切实履职尽责，健全议事规则与决策机制，加强统筹协调与监督考核；招标办要细化工作流程，强化过程管控与业务指导；各相关部门要密切配合、分工协作，形成工作合力，确保招标管理各项工作有序推进、落地见效。\n\n[标题引导段落]\n（四）强化数智赋能，提升管理效能。充分利用集团及公司数字化采购平台，推动招标业务线上化、透明化、可追溯化；加强供应商动态管理与全生命周期评价，提升寻源质量与竞争择优水平；强化风险预警与智能防控，持续提升招标管理价值创造能力。\n\n[空行]\n\n[空行]\n\n[落款]\n×××公司\n\n[落款]\n××××年×月××日\n\n[空行]\n\n[空行]\n\n[空行]\n\n[空行]\n\n[表格·示例数据表]\n|  | XX公司综合办公室 | XXXX年X月XX日印发 |  |\n"
+    },
+    {
+      "key": "impmtp3do0lwwckvk",
+      "name": "资料备参",
+      "description": "普通资料、备参模板",
+      "include": [
+        "标题",
+        "标题 1",
+        "正文段落",
+        "标题引导段落",
+        "页面",
+        "重点词语",
+        "副标题",
+        "标题 2",
+        "标题 3",
+        "正文"
+      ],
+      "styles": [
+        {
+          "key": "标题",
+          "category": "text",
+          "matchType": "special",
+          "match": "firstLine",
+          "mode": "whole",
+          "next": "正文段落",
+          "defaults": {
+            "font": "方正小标宋简体",
+            "size": 18,
+            "align": "center",
+            "line": 32,
+            "bold": true,
+            "indentChars": 0,
+            "rightIndentChars": 0,
+            "spaceBefore": 0,
+            "spaceAfter": 0
+          }
+        },
+        {
+          "key": "标题 1",
+          "category": "text",
+          "matchType": "regex",
+          "match": "^[一二三四五六七八九十]+、[^。：，]+$",
+          "mode": "whole",
+          "next": "正文段落",
+          "defaults": {
+            "font": "方正黑体简体",
+            "size": 16,
+            "align": "justify",
+            "line": 28,
+            "bold": true,
+            "indentChars": 2,
+            "rightIndentChars": 0,
+            "spaceBefore": 0,
+            "spaceAfter": 0
+          }
+        },
+        {
+          "key": "正文段落",
+          "category": "text",
+          "matchType": "special",
+          "match": "default",
+          "mode": "whole",
+          "next": "正文段落",
+          "defaults": {
+            "font": "方正仿宋简体",
+            "size": 16,
+            "align": "justify",
+            "line": 28,
+            "bold": false,
+            "indentChars": 2,
+            "rightIndentChars": 0,
+            "spaceBefore": 0,
+            "spaceAfter": 0
+          }
+        },
+        {
+          "key": "标题引导段落",
+          "category": "text",
+          "matchType": "regex",
+          "match": "^[一二三四五六七八九十]+要|^第[一二三四五六七八九十]+，",
+          "mode": "lead",
+          "next": "正文段落",
+          "defaults": {
+            "font": "方正楷体简体",
+            "size": 16,
+            "align": "justify",
+            "line": 28,
+            "bold": true,
+            "indentChars": 2,
+            "rightIndentChars": 0,
+            "spaceBefore": 0,
+            "spaceAfter": 0
+          }
+        },
+        {
+          "key": "页面",
+          "category": "page",
+          "matchType": "none",
+          "match": "",
+          "mode": "whole",
+          "defaults": {
+            "font": null,
+            "size": null,
+            "align": null,
+            "line": null,
+            "bold": false,
+            "indentChars": null,
+            "rightIndentChars": null,
+            "spaceBefore": 0,
+            "spaceAfter": 0,
+            "width": 11906,
+            "height": 16838,
+            "marginTop": 2098,
+            "marginRight": 1474,
+            "marginBottom": 1984,
+            "marginLeft": 1587,
+            "linePitch": 435,
+            "pageFont": "宋体",
+            "pageSize": 14,
+            "pageAlign": "center"
+          }
+        },
+        {
+          "key": "重点词语",
+          "category": "char",
+          "matchType": "none",
+          "match": "",
+          "mode": "whole",
+          "defaults": {
+            "font": "方正楷体简体",
+            "size": null,
+            "align": null,
+            "line": null,
+            "bold": true,
+            "indentChars": null,
+            "rightIndentChars": null,
+            "spaceBefore": 0,
+            "spaceAfter": 0
+          }
+        },
+        {
+          "key": "副标题",
+          "category": "text",
+          "matchType": "special",
+          "match": "subtitle",
+          "mode": "whole",
+          "next": "副标题",
+          "defaults": {
+            "font": "方正楷体简体",
+            "size": 16,
+            "align": "center",
+            "line": 28,
+            "bold": false,
+            "indentChars": 0,
+            "spaceBefore": 0,
+            "spaceAfter": 0
+          }
+        },
+        {
+          "key": "标题 2",
+          "category": "text",
+          "matchType": "regex",
+          "match": "^（[一二三四五六七八九十]+）[^。：，]+$",
+          "mode": "whole",
+          "next": "正文段落",
+          "defaults": {
+            "font": "方正楷体简体",
+            "size": 16,
+            "align": "justify",
+            "line": 28,
+            "bold": true,
+            "indentChars": 2,
+            "spaceBefore": 0,
+            "spaceAfter": 0
+          }
+        },
+        {
+          "key": "标题 3",
+          "category": "text",
+          "matchType": "regex",
+          "match": "^[1-9]\\d*[\\.、][^。：，]+$|^（[1-9]\\d*）[^。：，]+$",
+          "mode": "whole",
+          "next": "正文段落",
+          "defaults": {
+            "font": "方正仿宋简体",
+            "size": 16,
+            "align": "justify",
+            "line": 28,
+            "bold": true,
+            "indentChars": 2,
+            "spaceBefore": 0,
+            "spaceAfter": 0
+          }
+        },
+        {
+          "key": "正文",
+          "category": "text",
+          "matchType": "none",
+          "match": "",
+          "mode": "whole",
+          "next": "正文",
+          "defaults": {
+            "font": "方正仿宋简体",
+            "size": 16,
+            "align": "justify",
+            "line": 28,
+            "bold": false,
+            "indentChars": 0,
+            "spaceBefore": 0,
+            "spaceAfter": 0
+          }
+        }
+      ],
+      "styleOverrides": [],
+      "page": {
+        "width": 11906,
+        "height": 16838,
+        "marginTop": 2098,
+        "marginRight": 1474,
+        "marginBottom": 1984,
+        "marginLeft": 1587,
+        "linePitch": 312,
+        "numberGap": 7,
+        "marginHeader": 851,
+        "titlePage": false,
+        "oddEven": true,
+        "header": null,
+        "footer": {
+          "font": "方正仿宋简体",
+          "size": 14,
+          "variants": {
+            "default": [
+              {
+                "align": "center",
+                "tabStops": [
+                  {
+                    "align": "center",
+                    "pos": 4153
+                  },
+                  {
+                    "align": "right",
+                    "pos": 8306
+                  }
+                ],
+                "runs": [
+                  {
+                    "t": "text",
+                    "text": "—",
+                    "size": 14
+                  },
+                  {
+                    "t": "page",
+                    "kind": "current",
+                    "size": 14
+                  },
+                  {
+                    "t": "text",
+                    "text": "—",
+                    "size": 14
+                  }
+                ],
+                "outside": true
+              }
+            ],
+            "first": null,
+            "even": null
+          }
+        },
+        "pageNumber": {
+          "format": "dash",
+          "align": "center",
+          "first": true
+        }
+      },
+      "sample": "[标题]\n关于成立集团公司生产运营平台专家中心的建议\n\n[空行]\n\n[正文段落]\n在党组的高度重视与大力推动下，生产运营平台提前完成“国内企业全面上线”目标，五条职能主线全面贯通，助推生产运营提质增效，信息化补强建设迈出新步伐。当前，工作重心正从大规模建设向规模化深化应用迈进，持续赋能生产运营数智化发展。为加快推进“人工智能+”专项行动和数……\n\n[标题 1]\n一、成立专家中心的迫切性、必要性\n\n[正文段落]\n生产运营平台虽已完成全面上线目标，但在从建设向运营转换的过程中，面临以下挑战：\n\n[标题引导段落]\n一是深化应用与系统迭代升级需求迫切。 已上线的部分业务功能仍存在不好用、卡顿、业务协同不足等现象；十个领域持续涌现新需求，涉及计划优化、生产运行能力提升、设备全生命周期管理、安全环保补强、碳资产集中管控、应急指挥集成应用和智能化应用等方向，而迭代升级的机制尚未……\n\n[标题引导段落]\n二是流程标准化与系统整合任务艰巨。 管理要求尚未全面固化为平台流程和规则，跨领域、跨单位流程贯通仍存在断点、盲点和冗余环节。部分核心业务域、支撑域与管理域的边界和层级关系不够清晰，各建各的、重复投入、方向分散的问题依然突出；流程节点标准化精细化程度不足，大量业……\n\n[标题引导段落]\n三是高质量数据供给能力严重不足。 面向人工智能的高质量数据供给能力尚未形成。部分数据口径不统一、填报完整性不足，生产现场数据自动化采集率与应采尽采目标仍有距离；高质量数据集建设刚刚起步，数据供给主要面向传统应用场景，难以支撑集团经营决策、跨板块协同和智能化应用……\n\n[标题 1]\n二、工作建议\n\n[正文段落]\n为实现平台从建设到运营的平滑过渡，持续落实集团公司党组关于平台的定位，建议：成立集团公司生产运营平台专家中心实体组织。明确定位和目标，确保组织、岗位、职责、机制、人员、措施等快速到位，统筹平台规划、建设、运营全链条工作，开展流程标准化、业务需求、系统整合、数据……\n"
+    },
+    {
+      "key": "impmtzp49gwh7pq7s",
+      "name": "日程安排",
+      "description": "调研、交流日程安排",
+      "include": [
+        "标题",
+        "标题 1",
+        "正文段落",
+        "标题引导段落",
+        "页面",
+        "重点词语",
+        "副标题",
+        "标题 2",
+        "正文"
+      ],
+      "styles": [
+        {
+          "key": "标题",
+          "category": "text",
+          "matchType": "special",
+          "match": "firstLine",
+          "mode": "whole",
+          "next": "正文段落",
+          "defaults": {
+            "font": "方正小标宋简体",
+            "size": 22,
+            "align": "center",
+            "line": null,
+            "lineMult": 1,
+            "bold": true,
+            "indentChars": 0,
+            "rightIndentChars": 0,
+            "spaceBefore": 0,
+            "spaceAfter": 0
+          }
+        },
+        {
+          "key": "标题 1",
+          "category": "text",
+          "matchType": "regex",
+          "match": "^[一二三四五六七八九十]+、[^。：，]+$",
+          "mode": "whole",
+          "next": "正文段落",
+          "defaults": {
+            "font": "方正楷体简体",
+            "size": 16,
+            "align": "justify",
+            "line": 28,
+            "bold": true,
+            "indentChars": 2,
+            "rightIndentChars": 0,
+            "spaceBefore": 0,
+            "spaceAfter": 0
+          }
+        },
+        {
+          "key": "正文段落",
+          "category": "text",
+          "matchType": "special",
+          "match": "default",
+          "mode": "whole",
+          "next": "正文段落",
+          "defaults": {
+            "font": "方正仿宋简体",
+            "size": 16,
+            "align": "justify",
+            "line": 28,
+            "bold": false,
+            "indentChars": 2,
+            "rightIndentChars": 0,
+            "spaceBefore": 0,
+            "spaceAfter": 0
+          }
+        },
+        {
+          "key": "标题引导段落",
+          "category": "text",
+          "matchType": "regex",
+          "match": "^[一二三四五六七八九十]+要|^第[一二三四五六七八九十]+，",
+          "mode": "lead",
+          "next": "正文段落",
+          "defaults": {
+            "font": "方正黑体简体",
+            "size": 16,
+            "align": "justify",
+            "line": 28,
+            "bold": false,
+            "indentChars": 2,
+            "rightIndentChars": 0,
+            "spaceBefore": 0,
+            "spaceAfter": 0
+          }
+        },
+        {
+          "key": "页面",
+          "category": "page",
+          "matchType": "none",
+          "match": "",
+          "mode": "whole",
+          "defaults": {
+            "font": null,
+            "size": null,
+            "align": null,
+            "line": null,
+            "bold": false,
+            "indentChars": null,
+            "rightIndentChars": null,
+            "spaceBefore": 0,
+            "spaceAfter": 0,
+            "width": 11906,
+            "height": 16838,
+            "marginTop": 2098,
+            "marginRight": 1474,
+            "marginBottom": 1984,
+            "marginLeft": 1587,
+            "linePitch": 435,
+            "pageFont": "宋体",
+            "pageSize": 14,
+            "pageAlign": "center"
+          }
+        },
+        {
+          "key": "重点词语",
+          "category": "char",
+          "matchType": "none",
+          "match": "",
+          "mode": "whole",
+          "defaults": {
+            "font": "方正楷体简体",
+            "size": null,
+            "align": null,
+            "line": null,
+            "bold": true,
+            "indentChars": null,
+            "rightIndentChars": null,
+            "spaceBefore": 0,
+            "spaceAfter": 0
+          }
+        },
+        {
+          "key": "副标题",
+          "category": "text",
+          "matchType": "special",
+          "match": "subtitle",
+          "mode": "whole",
+          "next": "副标题",
+          "defaults": {
+            "font": "方正楷体简体",
+            "size": 16,
+            "align": "center",
+            "line": 28,
+            "bold": false,
+            "indentChars": 0,
+            "spaceBefore": 0,
+            "spaceAfter": 0
+          }
+        },
+        {
+          "key": "标题 2",
+          "category": "text",
+          "matchType": "regex",
+          "match": "^（[一二三四五六七八九十]+）[^。：，]+$",
+          "mode": "whole",
+          "next": "正文段落",
+          "defaults": {
+            "font": "方正仿宋简体",
+            "size": 16,
+            "align": "justify",
+            "line": 28,
+            "bold": true,
+            "indentChars": 2,
+            "spaceBefore": 0,
+            "spaceAfter": 0
+          }
+        },
+        {
+          "key": "正文",
+          "category": "text",
+          "matchType": "none",
+          "match": "",
+          "mode": "whole",
+          "next": "正文",
+          "defaults": {
+            "font": "方正仿宋简体",
+            "size": 16,
+            "align": "justify",
+            "line": 28,
+            "bold": false,
+            "indentChars": 0,
+            "spaceBefore": 0,
+            "spaceAfter": 0
+          }
+        }
+      ],
+      "styleOverrides": [],
+      "page": {
+        "width": 11906,
+        "height": 16838,
+        "marginTop": 2098,
+        "marginRight": 1474,
+        "marginBottom": 1984,
+        "marginLeft": 1587,
+        "linePitch": 312,
+        "numberGap": 7,
+        "marginHeader": 851,
+        "titlePage": false,
+        "oddEven": false,
+        "header": {
+          "font": "方正小标宋简体",
+          "size": 36,
+          "variants": {
+            "default": [
+              {
+                "align": "distribute",
+                "tabStops": [
+                  {
+                    "align": "left",
+                    "pos": 7513
+                  }
+                ],
+                "runs": [
+                  {
+                    "t": "text",
+                    "text": "单位名称",
+                    "font": "方正小标宋简体",
+                    "fontSet": {
+                      "ascii": "宋体",
+                      "hAnsi": "宋体",
+                      "eastAsia": "方正小标宋简体",
+                      "hint": "eastAsia"
+                    },
+                    "size": 36,
+                    "charScale": 62,
+                    "color": "FF0000"
+                  },
+                  {
+                    "t": "text",
+                    "text": "有限责任公司",
+                    "font": "方正小标宋简体",
+                    "fontSet": {
+                      "ascii": "宋体",
+                      "hAnsi": "宋体",
+                      "eastAsia": "方正小标宋简体",
+                      "hint": "eastAsia"
+                    },
+                    "size": 36,
+                    "charScale": 62,
+                    "color": "FF0000"
+                  }
+                ],
+                "line": 38,
+                "lineRule": "exact",
+                "indRight": -113
+              },
+              {
+                "align": "right",
+                "tabStops": [],
+                "runs": [
+                  {
+                    "t": "rule",
+                    "color": "FF0000",
+                    "weight": 4.75,
+                    "lineStyle": "thickThin",
+                    "x": -340,
+                    "w": 9524
+                  }
+                ],
+                "line": 8,
+                "lineRule": "exact"
+              }
+            ],
+            "first": null,
+            "even": null
+          }
+        },
+        "footer": null,
+        "pageNumber": {
+          "format": "none",
+          "align": "center",
+          "first": true
+        }
+      },
+      "sample": "[空行]\n\n[空行]\n\n[标题]\n×××公司调研交流日程安排\n\n[空行]\n\n[标题引导段落]\n会议时间：××××年×月×日（周×）9:00-11:30\n\n[标题引导段落]\n会议地点：昌平科技园A19地块1号楼×××会议室\n\n[标题引导段落]\n会议内容：\n\n[标题 1]\n一、展厅参观（30分钟）\n\n[正文段落]\n1. 参观×××企业展厅\n\n[正文段落]\n2. 参观上游物联网实验室\n\n[正文段落]\n3. 参观下游物联网实验室\n\n[正文段落]\n4. 参观网络安全实验室\n\n[正文段落]\n以上一般不超过3项，20~30分钟\n\n[标题 1]\n二、座谈交流（2小时）\n\n[正文段落]\n1. ×××汇报（×××，30分钟）\n\n[正文段落]\n2. ×××汇报\n\n[正文段落]\n3. 交流研讨\n\n[正文段落]\n4. 总结发言\n\n[分页]\n\n[标题]\n参会人员\n\n[空行]\n\n[标题 1]\n×××公司\n\n[正文段落]\n×××　董事长\n\n[正文段落]\n×××　副总经理\n\n[正文段落]\n×××　×××部总经理\n\n[正文段落]\n×××　×××部总经理\n\n[空行]\n\n[标题 1]\n×××公司\n\n[正文段落]\n×××　×××\n\n[正文段落]\n姓名、职务\n"
+    }
+  ]
+}

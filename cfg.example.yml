@@ -1,0 +1,18 @@
+# 文档审核 —— OpenAI 兼容 LLM 服务配置
+# 挂载到容器 /cfg/cfg.yml（或用 DOC_AUDIT_CFG 指向）。容器启动时据此生成 llms.json。
+# 支持 # 注释；字符串可加引号。
+
+llm:
+  name: "我的模型服务"          # 服务名称（显示用）
+  baseUrl: "https://api.example.com/v1"   # OpenAI 兼容网关，末尾不带 / 也可以
+  apiKey: "sk-your-api-key"     # 网关密钥
+  timeoutMs: 60                 # 单个请求超时（秒），默认 15，最大 120
+
+  models:
+    - name: "gpt-4o"           # 模型名（网关侧实际模型标识）
+      default: true            # 默认模型，有且仅有一个；未标注时取第一个
+      maxTokens: 8192          # 可选，最大输出 token
+      note: "默认模型"
+    # - name: "deepseek-chat"
+    #   maxTokens: 8192
+    #   note: "备用模型"
