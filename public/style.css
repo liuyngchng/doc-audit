@@ -3035,4 +3035,7 @@ button.danger:hover { background: rgba(239,68,68,.08); border-color: var(--err);
 .submenu-arrow { font-size: 12px; }
 .llmd-zone-ic i { font-size: 14px; line-height: 1; }
 .conv-line .conv-ic i { font-size: 13px; line-height: 1; }
+.upload-ic i { font-size: 20px; line-height: 1; color: var(--accent); }
+.upload-file .uf-ic i { font-size: 14px; line-height: 1; color: var(--muted); }
+.upload-file .uf-remove i { font-size: 12px; line-height: 1; }
 

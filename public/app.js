@@ -1,4 +1,4 @@
-/* 文档审核（文档格式化输出）· 模板设计器逻辑
+/* 文档审核 · 模板设计器逻辑
    概念：模板集（TemplateSet）包含多个模板（Template）；模板设计对象是「模板集 / 模板」。
    属性区为 Word 风格「样式」面板：样式列表（名称+摘要+启用开关）→ 点击展开格式编辑。 */
 
@@ -5367,10 +5367,10 @@ function renderUploadList() {
   if (!list) return;
   list.innerHTML = convertLocalFiles.map((f, i) => `
     <div class="upload-file">
-      <span class="uf-ic">📄</span>
+      <span class="uf-ic"><i class="fas fa-file-lines"></i></span>
       <span class="uf-name" title="${esc(f.name)}">${esc(f.name)}</span>
       <span class="uf-size">${formatBytes(f.size)}</span>
-      <span class="uf-remove" data-i="${i}" title="移除">✕</span>
+      <span class="uf-remove" data-i="${i}" title="移除"><i class="fas fa-xmark"></i></span>
     </div>`).join("");
   list.querySelectorAll(".uf-remove").forEach(el => {
     el.addEventListener("click", e => {
