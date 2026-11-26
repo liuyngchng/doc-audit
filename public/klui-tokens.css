@@ -2,12 +2,12 @@
    重新生成： go run ./klUI/cmd/gentokens */
 
 :root {
-  --kl-color-brand-50: #eff6ff;
-  --kl-color-brand-100: #dbeafe;
-  --kl-color-brand-300: #93c5fd;
-  --kl-color-brand-500: #2563eb;
-  --kl-color-brand-600: #1d4ed8;
-  --kl-color-brand-700: #1e40af;
+  --kl-color-brand-50: #eef2fa;
+  --kl-color-brand-100: #dbe4f2;
+  --kl-color-brand-300: #a3b6d8;
+  --kl-color-brand-500: #4b6cb7;
+  --kl-color-brand-600: #3a5a9e;
+  --kl-color-brand-700: #2c487e;
   --kl-color-neutral-0: #ffffff;
   --kl-color-neutral-50: #f8fafc;
   --kl-color-neutral-100: #f1f5f9;
@@ -20,10 +20,10 @@
   --kl-color-semantic-danger-bg: #fef2f2;
   --kl-color-semantic-danger-border: #fecaca;
   --kl-color-semantic-danger-text: #991b1b;
-  --kl-color-semantic-info: #2563eb;
-  --kl-color-semantic-info-bg: #eff6ff;
-  --kl-color-semantic-info-border: #bfdbfe;
-  --kl-color-semantic-info-text: #1e40af;
+  --kl-color-semantic-info: #4b6cb7;
+  --kl-color-semantic-info-bg: #eef2fa;
+  --kl-color-semantic-info-border: #a3b6d8;
+  --kl-color-semantic-info-text: #2c487e;
   --kl-color-semantic-success: #16a34a;
   --kl-color-semantic-success-bg: #f0fdf4;
   --kl-color-semantic-success-border: #bbf7d0;
@@ -161,12 +161,12 @@
 }
 
 [data-theme="light"] {
-  --kl-color-brand-50: #eff6ff;
-  --kl-color-brand-100: #dbeafe;
-  --kl-color-brand-300: #93c5fd;
-  --kl-color-brand-500: #2563eb;
-  --kl-color-brand-600: #1d4ed8;
-  --kl-color-brand-700: #1e40af;
+  --kl-color-brand-50: #eef2fa;
+  --kl-color-brand-100: #dbe4f2;
+  --kl-color-brand-300: #a3b6d8;
+  --kl-color-brand-500: #4b6cb7;
+  --kl-color-brand-600: #3a5a9e;
+  --kl-color-brand-700: #2c487e;
   --kl-color-neutral-0: #ffffff;
   --kl-color-neutral-50: #f8fafc;
   --kl-color-neutral-100: #f1f5f9;
@@ -179,10 +179,10 @@
   --kl-color-semantic-danger-bg: #fef2f2;
   --kl-color-semantic-danger-border: #fecaca;
   --kl-color-semantic-danger-text: #991b1b;
-  --kl-color-semantic-info: #2563eb;
-  --kl-color-semantic-info-bg: #eff6ff;
-  --kl-color-semantic-info-border: #bfdbfe;
-  --kl-color-semantic-info-text: #1e40af;
+  --kl-color-semantic-info: #4b6cb7;
+  --kl-color-semantic-info-bg: #eef2fa;
+  --kl-color-semantic-info-border: #a3b6d8;
+  --kl-color-semantic-info-text: #2c487e;
   --kl-color-semantic-success: #16a34a;
   --kl-color-semantic-success-bg: #f0fdf4;
   --kl-color-semantic-success-border: #bbf7d0;
